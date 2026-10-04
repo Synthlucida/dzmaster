@@ -1,0 +1,3054 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title data-i18n="page_title">DZMASTER — Automatický online mastering hudby | SYNTHLUCIDA</title>
+<meta name="description" data-i18n="page_desc" content="Nahrajte WAV a DZMASTER během pár vteřin ve vašem prohlížeči udělá základní mastering — správná hlasitost a bezpečné špičky pro Spotify, YouTube i běžné přehrávače. Zdarma, bez instalace, soubor se nikam neodesílá.">
+<meta name="author" content="DZMASTER">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://synthlucida.com/dzmaster/dzmaster.html">
+<link rel="alternate" hreflang="cs" href="https://synthlucida.com/dzmaster/dzmaster.html">
+<link rel="alternate" hreflang="en" href="https://synthlucida.com/dzmaster/dzmaster-en.html">
+<link rel="alternate" hreflang="x-default" href="https://synthlucida.com/dzmaster/dzmaster.html">
+
+<!-- ===== Open Graph ===== -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SYNTHLUCIDA">
+<meta property="og:title" data-i18n-attr="page_title" content="DZMASTER — Automatický online mastering hudby">
+<meta property="og:description" data-i18n-attr="page_desc" content="Nahrajte WAV, vyberte předvolbu, stáhněte mastrovanou stopu. Vše přímo v prohlížeči, zdarma.">
+<meta property="og:url" content="https://synthlucida.com/dzmaster/dzmaster.html">
+<meta property="og:image" content="https://synthlucida.com/dzmaster/dzmaster-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="cs_CZ">
+<meta property="og:locale:alternate" content="en_US">
+
+<!-- ===== Twitter / X card ===== -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" data-i18n-attr="page_title" content="DZMASTER — Automatický online mastering hudby">
+<meta name="twitter:description" data-i18n-attr="page_desc" content="Nahrajte WAV, vyberte předvolbu, stáhněte mastrovanou stopu. Vše přímo v prohlížeči, zdarma.">
+<meta name="twitter:image" content="https://synthlucida.com/dzmaster/dzmaster-og.png">
+
+<meta name="theme-color" content="#0b0d17">
+
+<!-- ===== Favicon ===== -->
+<link rel="icon" href="/dzmaster/icons/dzmaster-favicon.ico" sizes="any">
+<link rel="icon" href="/dzmaster/icons/dzmaster-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/dzmaster/icons/dzmaster-apple-touch-icon.png">
+
+<!-- ===== PWA manifest (no service worker on purpose -- this tool has no
+     offline/cacheable state worth installing for, it's a one-shot
+     upload-process-download flow) ===== -->
+<link rel="manifest" href="/dzmaster/manifest-dzmaster-cz.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DZMASTER">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DZMASTER",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Any (web browser)",
+  "url": "https://synthlucida.com/dzmaster/dzmaster.html",
+  "description": "Online nástroj pro automatický mastering hudby přímo v prohlížeči. Analyzuje WAV soubor a upraví hlasitost a špičky podle cílové platformy (Spotify, YouTube, Apple Music a dalších). Všechny předvolby jsou zdarma.",
+  "inLanguage": "cs",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "featureList": [
+    "Měření integrované hlasitosti (LUFS) podle ITU-R BS.1770 a true peak (4× převzorkování)",
+    "9 předvoleb pro konkrétní platformy (Streaming, Apple/Podcast, Club/EDM, Broadcast EBU R128, Podcast/Audiokniha ACX, Bandcamp, Vinyl, TikTok/Reels/Shorts, Klasika) a Smart Auto",
+    "True-peak look-ahead limiter, který drží strop předvolby i pro inter-sample špičky",
+    "Export mastrovaného WAV (16 nebo 24-bit), při 16-bit s TPDF ditheringem",
+    "Pokročilé (nepovinné) nastavení: 3pásmový EQ, vícepásmová komprese, stereo šířka, basy do mono, sytost/teplo, oříznutí ticha s fade",
+    "Veškeré zpracování běží lokálně v prohlížeči, bez uploadu na server"
+  ],
+  "publisher": { "@type": "Organization", "name": "SYNTHLUCIDA" }
+}
+</script>
+<style>
+  :root{
+    --bg-0:#090a12; --bg-1:#0f1120; --bg-2:#161933; --card:#151830cc;
+    --line:#2a2f57; --line-soft:#20244a;
+    --text-0:#f3f4fb; --text-1:#b7bce0; --text-2:#7d82ab;
+    --accent-1:#7c6cff; --accent-2:#34e0d6; --accent-3:#ff6ec7;
+    --ok:#4be3a4; --warn:#ffb454; --err:#ff6b8b;
+    --radius:16px; --radius-sm:10px;
+    --shadow: 0 20px 60px -25px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;
+    color:var(--text-0);
+    background:
+      radial-gradient(1200px 700px at 15% -10%, #2a2470 0%, transparent 60%),
+      radial-gradient(1000px 700px at 110% 10%, #113a3a 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1) 40%, var(--bg-0));
+    min-height:100vh;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-2);}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px;}
+  header.top{
+    position:sticky; top:0; z-index:20;
+    backdrop-filter:blur(14px);
+    background:linear-gradient(180deg, rgba(9,10,18,.85), rgba(9,10,18,.55));
+    border-bottom:1px solid var(--line-soft);
+  }
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;max-width:920px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em;font-size:19px;}
+  .brand .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .brand small{display:block;font-weight:500;color:var(--text-2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:1px;}
+  .lang-toggle{display:flex;gap:4px;background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:3px;}
+  .lang-toggle button{border:0;background:transparent;color:var(--text-2);padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;}
+  .lang-toggle button.active{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));color:#0a0b14;}
+  .topbar-right{display:flex;align-items:center;gap:12px;}
+  .home-link{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);color:var(--text-1);flex-shrink:0;}
+  .home-link:hover{border-color:var(--accent-1);color:var(--text-0);}
+
+  main{padding:44px 0 90px;}
+  .hero{text-align:center;margin-bottom:38px;}
+  .hero h1{font-size:clamp(28px,5vw,42px);margin:0 0 14px;font-weight:800;letter-spacing:-.01em;}
+  .hero h1 .grad{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero p{color:var(--text-1);max-width:560px;margin:0 auto;font-size:16px;}
+  .trust-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px;}
+  .pill{font-size:12.5px;color:var(--text-1);background:var(--bg-2);border:1px solid var(--line-soft);padding:6px 12px;border-radius:999px;display:flex;align-items:center;gap:6px;}
+  .pill svg{width:13px;height:13px;flex:none;}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:26px; margin-bottom:20px; backdrop-filter:blur(6px);
+  }
+
+  .promo-banner{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    background:linear-gradient(120deg, rgba(124,108,255,.14), rgba(52,224,214,.10));
+    border:1px solid var(--line); border-radius:var(--radius); padding:18px 22px; margin-bottom:26px;
+  }
+  .promo-banner .promo-icon{font-size:26px; flex:none;}
+  .promo-banner .promo-body{flex:1; min-width:200px;}
+  .promo-banner .promo-tag{font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-2); font-weight:700; margin-bottom:2px;}
+  .promo-banner .promo-title{font-weight:800; font-size:15px;}
+  .promo-banner .promo-text{color:var(--text-1); font-size:13px; margin-top:2px;}
+  .promo-banner .promo-cta{
+    flex:none; display:inline-flex; align-items:center; gap:6px;
+    background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); color:#0a0b14; font-weight:800;
+    text-decoration:none; padding:10px 18px; border-radius:10px; font-size:13.5px; white-space:nowrap;
+  }
+  .promo-banner .promo-cta:hover{filter:brightness(1.07);}
+  .card h2{margin:0 0 4px;font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-2);font-weight:700;}
+  .card h3{margin:0 0 14px;font-size:20px;font-weight:800;}
+
+  .dropzone{
+    border:2px dashed var(--line); border-radius:var(--radius-sm);
+    padding:38px 20px; text-align:center; cursor:pointer;
+    transition:border-color .15s, background .15s;
+    background:linear-gradient(180deg,rgba(124,108,255,.04),rgba(52,224,214,.03));
+  }
+  .dropzone:hover, .dropzone.drag{border-color:var(--accent-1); background:rgba(124,108,255,.08);}
+  .dropzone .icon{width:52px;height:52px;margin:0 auto 14px;color:var(--accent-2);}
+  .dropzone strong{font-size:16px;}
+  .dropzone .sub{color:var(--text-2);font-size:13px;margin-top:6px;}
+  input[type=file]{display:none;}
+
+  .file-info{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-2);border:1px solid var(--line-soft);border-radius:var(--radius-sm);margin-top:16px;}
+  .file-info .fname{font-weight:700;font-size:14px;word-break:break-all;}
+  .file-info .fmeta{color:var(--text-2);font-size:12.5px;margin-top:2px;}
+  .file-info button.clear{margin-left:auto;background:none;border:1px solid var(--line);color:var(--text-1);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px;flex:none;}
+
+  .presets{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px;}
+  @media (max-width:560px){ .presets{grid-template-columns:1fr;} }
+  .preset{
+    text-align:left; border:1px solid var(--line); background:var(--bg-2); border-radius:var(--radius-sm);
+    padding:16px; cursor:pointer; color:var(--text-0); font-family:inherit;
+    transition:transform .1s, border-color .15s, background .15s;
+  }
+  .preset:hover{border-color:var(--accent-1);}
+  .preset.selected{border-color:var(--accent-2); background:linear-gradient(180deg,rgba(52,224,214,.14),rgba(124,108,255,.08)); box-shadow:0 0 0 1px var(--accent-2) inset;}
+  .preset .ptitle{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap;row-gap:4px;}
+  .preset .ptitle>span:first-child{flex:1 1 auto;min-width:0;}
+  .preset .pmeta{display:inline-flex;align-items:center;gap:8px;flex:none;margin-left:auto;}
+  .preset .ptarget{font-size:11px;color:var(--accent-2);font-weight:700;background:rgba(52,224,214,.12);padding:2px 8px;border-radius:999px;white-space:nowrap;flex:none;}
+  .preset .pdesc{color:var(--text-2);font-size:12.5px;margin-top:6px;}
+  @media (max-width:560px){
+    .preset .ptitle{font-size:14px;}
+  }
+
+
+
+  .bitdepth{display:flex;gap:10px;align-items:center;margin-top:16px;font-size:13px;color:var(--text-1);}
+  .bitdepth label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+
+  details.advanced{margin-top:18px;border-top:1px solid var(--line-soft);padding-top:14px;}
+  details.advanced summary{cursor:pointer;color:var(--text-1);font-size:13.5px;font-weight:700;list-style:none;display:flex;align-items:center;gap:6px;}
+  details.advanced summary::-webkit-details-marker{display:none;}
+  details.advanced summary::before{content:'▸';color:var(--accent-2);transition:transform .15s;font-size:11px;}
+  details.advanced[open] summary::before{transform:rotate(90deg);}
+  .advanced-body{margin-top:16px;display:flex;flex-direction:column;gap:18px;}
+  .adv-group-title{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);font-weight:700;margin-bottom:10px;}
+  .adv-slider-row{display:grid;grid-template-columns:100px 1fr 56px;align-items:center;gap:10px;margin-top:8px;}
+  .adv-slider-row:first-of-type{margin-top:0;}
+  .adv-slider-row label{font-size:13px;color:var(--text-1);}
+  .adv-slider-row input[type=range]{width:100%;accent-color:var(--accent-1);}
+  .adv-value{font-size:12.5px;color:var(--text-2);font-weight:700;text-align:right;font-variant-numeric:tabular-nums;}
+  .adv-checkbox-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-1);cursor:pointer;}
+  .adv-checkbox-row input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent-1);cursor:pointer;flex:none;}
+  .adv-hint{font-size:12px;color:var(--text-2);margin-top:2px;}
+  button.adv-reset{align-self:flex-start;background:none;border:1px solid var(--line);color:var(--text-1);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:12.5px;}
+  button.adv-reset:hover{border-color:var(--accent-1);color:var(--text-0);}
+
+  .process-row{display:flex;gap:12px;align-items:center;margin-top:22px;flex-wrap:wrap;}
+  button.primary{
+    background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); color:#0a0b14; border:0;
+    font-weight:800; font-size:15px; padding:14px 26px; border-radius:12px; cursor:pointer;
+    box-shadow:0 10px 30px -10px rgba(124,108,255,.55);
+  }
+  button.primary:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+  button.primary:not(:disabled):hover{filter:brightness(1.07);}
+  .status-line{font-size:13.5px;color:var(--text-1);}
+  .status-line.err{color:var(--err);}
+
+  .progress{height:8px;border-radius:999px;background:var(--bg-2);overflow:hidden;margin-top:14px;border:1px solid var(--line-soft);display:none;}
+  .progress.show{display:block;}
+  .progress .bar{height:100%;width:30%;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));animation:indet 1.1s ease-in-out infinite;}
+  @keyframes indet{0%{transform:translateX(-100%);}100%{transform:translateX(330%);}}
+
+  .results{display:none;}
+  .result-note{margin-top:16px;background:rgba(255,180,84,.08);border:1px solid rgba(255,180,84,.3);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text-1);line-height:1.55;}
+  .results.show{display:block;}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:18px 0;}
+  .stat{background:var(--bg-2);border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:14px;}
+  .stat .label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);font-weight:700;}
+  .stat .before{color:var(--text-2);font-size:13px;text-decoration:line-through;opacity:.7;}
+  .stat .after{font-size:19px;font-weight:800;color:var(--text-0);}
+  .stat .after.good{color:var(--ok);}
+
+  canvas.wave{width:100%;height:64px;display:block;border-radius:8px;background:var(--bg-2);border:1px solid var(--line-soft);margin-top:8px;}
+  .wave-label{font-size:11.5px;color:var(--text-2);margin:14px 0 2px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
+
+  .ab-toggle{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:18px;}
+  .ab-toggle .ab-label{font-size:11.5px;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
+  .ab-toggle .ab-btn{border:1px solid var(--line);background:var(--bg-2);color:var(--text-1);padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;}
+  .ab-toggle .ab-btn.selected{border-color:transparent;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));color:#0a0b14;}
+
+  audio{width:100%;margin-top:10px;filter:invert(0.86) hue-rotate(180deg);border-radius:10px;}
+
+  a.download-btn{
+    display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+    background:var(--ok); color:#06251a; font-weight:800; text-decoration:none;
+    padding:13px 22px;border-radius:12px;font-size:14.5px;
+  }
+
+
+  details.tech{margin-top:16px;font-size:12.5px;color:var(--text-2);}
+  details.tech summary{cursor:pointer;color:var(--text-1);}
+
+  .faq{margin-top:8px;}
+  .faq .q{font-weight:700;margin-top:16px;font-size:15px;}
+  .faq .a{color:var(--text-1);font-size:14px;margin-top:4px;}
+
+  details.guide{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px 26px; margin-bottom:20px; backdrop-filter:blur(6px);
+  }
+  details.guide summary{cursor:pointer;color:var(--text-0);font-size:15.5px;font-weight:800;list-style:none;display:flex;align-items:center;gap:8px;}
+  details.guide summary::-webkit-details-marker{display:none;}
+  details.guide summary::before{content:'▸';color:var(--accent-2);transition:transform .15s;font-size:12px;}
+  details.guide[open] summary::before{transform:rotate(90deg);}
+  .guide-body{margin-top:18px;}
+  .guide-section{margin-bottom:24px;}
+  .guide-section:last-child{margin-bottom:0;}
+  .guide-section h4{font-size:15px;margin:0 0 8px;color:var(--text-0);}
+  .guide-section p{color:var(--text-1);font-size:14px;margin:0 0 10px;line-height:1.65;}
+  .guide-section ul{color:var(--text-1);font-size:14px;padding-left:20px;margin:0 0 10px;}
+  .guide-section li{margin-bottom:7px;line-height:1.55;}
+  .guide-honest{display:flex;gap:8px;background:rgba(255,110,199,.08);border:1px solid rgba(255,110,199,.25);border-radius:var(--radius-sm);padding:12px 14px;font-size:13.5px;color:var(--text-1);margin-top:10px;line-height:1.6;}
+  .guide-honest strong{color:var(--text-0);flex:none;}
+
+  footer{border-top:1px solid var(--line-soft);padding:30px 0;text-align:center;color:var(--text-2);font-size:12.5px;}
+  footer a{color:var(--text-2);text-decoration:underline;}
+  footer .wrap{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 10px;}
+  footer .fitem{white-space:nowrap;}
+
+  .privacy-note{display:flex;gap:10px;align-items:flex-start;background:rgba(75,227,164,.08);border:1px solid rgba(75,227,164,.25);padding:12px 14px;border-radius:12px;font-size:13px;color:var(--text-1);margin-top:16px;}
+  .privacy-note svg{width:18px;height:18px;flex:none;color:var(--ok);margin-top:1px;}
+
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .visually-noscript{padding:16px;background:#3a1f1f;border:1px solid #6b2b2b;border-radius:10px;color:#ffd6d6;font-size:13px;}
+</style>
+<script data-goatcounter="https://dzmaster.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="topbar">
+    <div class="brand">
+      <span class="logo">🎚️</span>
+      <span>DZMASTER<small data-i18n="brand_sub">by SYNTHLUCIDA</small></span>
+    </div>
+    <div class="topbar-right">
+      <a href="https://synthlucida.com/dzmaster/dzmaster-landing.html" class="home-link" id="home-link" title="Domů" aria-label="Domů">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      </a>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" id="lang-cs" data-lang="cs">CZ</button>
+        <button type="button" id="lang-en" data-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h1 data-i18n="hero_h1">Mastering na jedno kliknutí — <span class="grad">přímo v prohlížeči</span></h1>
+    <p data-i18n="hero_p">Nahrajte WAV, vyberte cílovou platformu a DZMASTER během pár vteřin doladí hlasitost a špičky, aby stopa hrála čistě a konzistentně na Spotify, YouTube i běžných přehrávačích.</p>
+    <div class="trust-row">
+      <span class="pill" data-i18n="trust_1">🔒 Soubor se nikam neodesílá</span>
+      <span class="pill" data-i18n="trust_2">⚡ Zpracování v prohlížeči</span>
+      <span class="pill" data-i18n="trust_3">🆓 Zdarma, bez registrace</span>
+    </div>
+  </section>
+
+
+  <details class="guide" id="guide-details">
+    <summary data-i18n="guide_summary">📖 Jak připravit track a co od masteringu čekat (průvodce)</summary>
+    <div class="guide-body">
+
+      <div class="guide-section">
+        <h4 data-i18n="guide_prep_title">1. Jak připravit track před masteringem</h4>
+        <ul>
+          <li data-i18n="guide_prep_1">Exportujte z DAW jako WAV ve stejném sample rate jako projekt (44,1 nebo 48 kHz), ideálně 24-bit — zbytečné převzorkování nebo export do MP3 před masteringem jen ztrácí informace, které pak nejdou vrátit.</li>
+          <li data-i18n="guide_prep_2">Nechte na master bus rezervu (headroom): špičky mixu by měly sahat zhruba do −6 až −3 dBFS, ne narvané na 0 dB. Pokud máte na masteru limiter nebo maximizer, před exportem ho vypněte nebo hodně povolte — mastering potřebuje prostor, se kterým může pracovat.</li>
+          <li data-i18n="guide_prep_3">Zkontrolujte a případně ořízněte ticho na začátku a konci — nebo to nechte na volbu „Oříznout ticho“ v Pokročilém nastavení.</li>
+          <li data-i18n="guide_prep_4">Mastering doladí hlasitost a dynamiku, ale nespraví špatný mix. Konflikty mezi nástroji, přebušený bas, potichý vokál — tohle řešte zpátky v mixu, ne přes mastering.</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h4 data-i18n="guide_honest_title">2. Co mastering dokáže a co ne (bez příkras)</h4>
+        <p data-i18n="guide_honest_can">Dokáže: sjednotit hlasitost na správný cíl pro danou platformu, jemně vyrovnat dynamiku, ochránit stopu před ořezáním špiček při přehrávání i po kompresi do MP3/AAC, a přidat jemné tónové doladění nebo teplo.</p>
+        <p data-i18n="guide_honest_cannot">Nedokáže: opravit rozladěný nástroj, špatně nahraný zpěv, nevyvážený mix, sykavky, dunění místnosti nebo šum z nahrávání. Tyhle věci patří do nahrávání a mixu — mastering je až poslední doladění navrch, ne záchranná brzda.</p>
+        <div class="guide-honest">
+          <strong data-i18n="guide_honest_note_label">Upřímně:</strong>
+          <span data-i18n="guide_honest_note">mastering je tak z 5–10 % zvuku celé skladby. Většinu práce odvede dobrý mix. Pokud track nezní dobře před masteringem, nebude znít dobře ani po něm — jen hlasitěji.</span>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <h4 data-i18n="guide_preset_title">3. Jak vybrat předvolbu</h4>
+        <p data-i18n="guide_preset_1">Smart Auto je rozumný výchozí bod, pokud si nejste jistí — cílovou hlasitost odvodí z crest factoru (poměru špička/RMS) vaší nahrávky, takže dynamický akustický track dostane jiné zacházení než hutný elektronický mix.</p>
+        <p data-i18n="guide_preset_2">Nemá smysl honit co nejvyšší hlasitost za každou cenu. Spotify, YouTube i většina dalších služeb track stejně přenormalizují na svůj vlastní cíl — extra hlasitost navíc tak jen ubírá dynamiku a stopa zní unaveně, aniž by v přehrávači byla o cokoliv hlasitější.</p>
+      </div>
+
+      <div class="guide-section">
+        <h4 data-i18n="guide_mistakes_title">4. Časté chyby</h4>
+        <ul>
+          <li data-i18n="guide_mistake_1">Mastering ze souboru MP3/AAC místo WAV — komprimovaný formát informace nenávratně zahodil, mastering z něj je nemůže vrátit zpět.</li>
+          <li data-i18n="guide_mistake_2">Opakovaný mastering „na vrstvu“ — mastrovat už jednou mastrovaný soubor znovu a znovu. Každý průchod přidá trochu zkreslení a ubere dynamiku.</li>
+          <li data-i18n="guide_mistake_3">Přehnaně nahlas nabušený master bus ještě před masteringem — limiter nebo maximizer na finálním mixu nechá masteringu pracovat jen s tím, co mu zbylo.</li>
+          <li data-i18n="guide_mistake_4">Slepě věřit číslům (LUFS, true peak) bez poslechu — jsou to užitečné nástroje, ne náhrada uší.</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h4 data-i18n="guide_after_title">5. Po masteringu</h4>
+        <ul>
+          <li data-i18n="guide_after_1">Použijte přepínač Originál / Mastrováno a poslouchejte při stejné hlasitosti (loudness-matched) — hlasitější verze totiž skoro vždy zní „líp“, i když objektivně lepší není. DZMASTER hlasitost obou verzí v přehrávači sám nesrovnává, takže na to při poslechu pamatujte.</li>
+          <li data-i18n="guide_after_2">Pokud track míří i tam, kde se hraje mono (starší rádia, některé kluby), zkontrolujte mono kompatibilitu — nebo rovnou zapněte „Basy do mono“ v Pokročilém nastavení.</li>
+          <li data-i18n="guide_after_3">Než finální track schválíte, poslechněte si ho na víc než jednom zařízení — sluchátka, telefonní reproduktor, auto. Co zní skvěle na monitorech, nemusí sedět všude.</li>
+        </ul>
+      </div>
+
+    </div>
+  </details>
+
+  <section class="card" id="upload-card">
+    <h2 data-i18n="step1_kicker">Krok 1</h2>
+    <h3 data-i18n="step1_title">Nahrajte WAV soubor</h3>
+
+    <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload WAV file">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+      <div><strong data-i18n="drop_title">Přetáhněte sem .wav soubor</strong></div>
+      <div class="sub" data-i18n="drop_sub">nebo klikněte pro výběr souboru · max. 600 MB</div>
+    </div>
+    <input type="file" id="file-input" accept=".wav,audio/wav,audio/x-wav,audio/wave">
+
+    <div class="file-info" id="file-info" style="display:none;">
+      <div>
+        <div class="fname" id="file-name"></div>
+        <div class="fmeta" id="file-meta"></div>
+      </div>
+      <button class="clear" id="file-clear" type="button" data-i18n="clear_btn">Odebrat</button>
+    </div>
+
+    <div class="privacy-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l7 4v6c0 5-3.4 8.4-7 10-3.6-1.6-7-5-7-10V6l7-4z"/></svg>
+      <span data-i18n="privacy_note">Celý mastering (analýza, EQ, kompresor, limiter) běží lokálně ve vašem prohlížeči pomocí Web Audio / JavaScriptu. Váš track nikdy neopustí vaše zařízení a neprochází žádným serverem.</span>
+    </div>
+  </section>
+
+  <section class="card" id="preset-card">
+    <h2 data-i18n="step2_kicker">Krok 2</h2>
+    <h3 data-i18n="step2_title">Vyberte předvolbu</h3>
+    <div class="presets" id="presets">
+      <button class="preset" data-preset="smart">
+        <div class="ptitle"><span data-i18n="preset_smart_name">🧠 Smart Auto</span><span class="pmeta"><span class="ptarget" data-i18n="preset_smart_target">auto</span></span></div>
+        <div class="pdesc" data-i18n="preset_smart_desc">Software sám podle analýzy skladby vybere nejvhodnější cílovou hlasitost. Doporučeno, pokud si nejste jistí.</div>
+      </button>
+      <button class="preset" data-preset="streaming">
+        <div class="ptitle"><span data-i18n="preset_streaming_name">🎧 Streaming</span><span class="pmeta"><span class="ptarget">−14 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_streaming_desc">Spotify, YouTube a většina streamovacích služeb normalizuje na −14 LUFS. Univerzální bezpečná volba.</div>
+      </button>
+      <button class="preset" data-preset="apple">
+        <div class="ptitle"><span data-i18n="preset_apple_name">🍎 Apple / Podcast</span><span class="pmeta"><span class="ptarget">−16 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_apple_desc">Tišší, dynamičtější mastering pro Apple Music, mluvené slovo nebo akustické nahrávky.</div>
+      </button>
+      <button class="preset" data-preset="club">
+        <div class="ptitle"><span data-i18n="preset_club_name">🔊 Club / EDM</span><span class="pmeta"><span class="ptarget">−9 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_club_desc">Hlasitější, agresivnější limiting pro elektronickou hudbu a klubové sety.</div>
+      </button>
+      <button class="preset" data-preset="broadcast">
+        <div class="ptitle"><span data-i18n="preset_broadcast_name">📻 Broadcast (EBU R128)</span><span class="pmeta"><span class="ptarget">−23 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_broadcast_desc">Standard EBU R128 je povinný pro TV a rozhlas v EU. Vhodné pro vysílání a AV produkci.</div>
+      </button>
+      <button class="preset" data-preset="podcast">
+        <div class="ptitle"><span data-i18n="preset_podcast_name">🎙️ Podcast / Audiokniha (ACX)</span><span class="pmeta"><span class="ptarget">−19 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_podcast_desc">V rozsahu doporučeném pro ACX audioknihy (−23 až −18 dB RMS) a běžné podcastové platformy.</div>
+      </button>
+      <button class="preset" data-preset="bandcamp">
+        <div class="ptitle"><span data-i18n="preset_bandcamp_name">📀 Bandcamp / Přímé stažení</span><span class="pmeta"><span class="ptarget">−11 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_bandcamp_desc">Bandcamp na rozdíl od Spotify hlasitost při přehrávání dál nesrovnává — co nastavíte, to lidé uslyší.</div>
+      </button>
+      <button class="preset" data-preset="vinyl">
+        <div class="ptitle"><span data-i18n="preset_vinyl_name">💿 Vinyl / Fyzické vydání</span><span class="pmeta"><span class="ptarget">−14 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_vinyl_desc">Nižší hlasitost a víc prostoru pro špičky usnadní řezání desky a sníží riziko přeskakování jehly.</div>
+      </button>
+      <button class="preset" data-preset="social">
+        <div class="ptitle"><span data-i18n="preset_social_name">📱 TikTok / Reels / Shorts</span><span class="pmeta"><span class="ptarget">−13 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_social_desc">Blízko streamingu, ale o něco hlasitější pro krátká videa, která musí zaujmout hned na začátku.</div>
+      </button>
+      <button class="preset" data-preset="classical">
+        <div class="ptitle"><span data-i18n="preset_classical_name">🎻 Klasika / Akustika</span><span class="pmeta"><span class="ptarget">−18 LUFS</span></span></div>
+        <div class="pdesc" data-i18n="preset_classical_desc">Nejtišší a nejdynamičtější volba ze všech — zachová co nejvíc rozdílu mezi tichými a hlasitými pasážemi.</div>
+      </button>
+    </div>
+
+    <div class="bitdepth">
+      <span data-i18n="bitdepth_label">Výstup:</span>
+      <label><input type="radio" name="bitdepth" value="16" checked> <span data-i18n="bitdepth_16">16-bit (univerzální)</span></label>
+      <label><input type="radio" name="bitdepth" value="24"> <span data-i18n="bitdepth_24">24-bit (archivní kvalita)</span></label>
+    </div>
+
+    <details class="advanced" id="advanced-details">
+      <summary data-i18n="adv_summary">⚙️ Pokročilé nastavení (nepovinné)</summary>
+      <div class="advanced-body">
+        <div>
+          <div class="adv-group-title" data-i18n="adv_eq_title">Tónová korekce (EQ)</div>
+          <div class="adv-slider-row">
+            <label for="adv-bass" data-i18n="adv_bass_label">Basy · 120 Hz</label>
+            <input type="range" id="adv-bass" min="-12" max="12" step="0.5" value="0">
+            <span class="adv-value" id="adv-bass-value">0 dB</span>
+          </div>
+          <div class="adv-slider-row">
+            <label for="adv-mid" data-i18n="adv_mid_label">Středy · 1 kHz</label>
+            <input type="range" id="adv-mid" min="-12" max="12" step="0.5" value="0">
+            <span class="adv-value" id="adv-mid-value">0 dB</span>
+          </div>
+          <div class="adv-slider-row">
+            <label for="adv-treble" data-i18n="adv_treble_label">Výšky · 8 kHz</label>
+            <input type="range" id="adv-treble" min="-12" max="12" step="0.5" value="0">
+            <span class="adv-value" id="adv-treble-value">0 dB</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="adv-group-title" data-i18n="adv_dynamics_title">Dynamika</div>
+          <label class="adv-checkbox-row">
+            <input type="checkbox" id="adv-multiband">
+            <span data-i18n="adv_multiband_label">Vícepásmová komprese (basy, středy a výšky zvlášť)</span>
+          </label>
+          <div class="adv-hint" data-i18n="adv_multiband_hint">Jemnější výsledek na hutném mixu — hlasitý bas už "nestahuje" výšky dolů.</div>
+        </div>
+
+        <div>
+          <div class="adv-group-title" data-i18n="adv_width_title">Stereo šířka</div>
+          <div class="adv-slider-row">
+            <label for="adv-width" data-i18n="adv_width_label">Šířka</label>
+            <input type="range" id="adv-width" min="0" max="200" step="5" value="100">
+            <span class="adv-value" id="adv-width-value">100%</span>
+          </div>
+          <div class="adv-hint" data-i18n="adv_width_hint">0 % = mono, 100 % = originál, 200 % = maximálně široké. Netýká se mono souborů.</div>
+          <label class="adv-checkbox-row">
+            <input type="checkbox" id="adv-bassmono">
+            <span data-i18n="adv_bassmono_label">Basy do mono pod 120 Hz</span>
+          </label>
+          <div class="adv-hint" data-i18n="adv_bassmono_hint">Bezpečnější přehrávání na mono systémech i na vinylu, výšky zůstávají stereo.</div>
+        </div>
+
+        <div>
+          <div class="adv-group-title" data-i18n="adv_saturation_title">Sytost / teplo</div>
+          <div class="adv-slider-row">
+            <label for="adv-saturation" data-i18n="adv_saturation_label">Sytost</label>
+            <input type="range" id="adv-saturation" min="0" max="100" step="5" value="0">
+            <span class="adv-value" id="adv-saturation-value">0%</span>
+          </div>
+          <div class="adv-hint" data-i18n="adv_saturation_hint">0 % = beze změny, vyšší hodnoty přidají jemné harmonické zabarvení.</div>
+        </div>
+
+        <div>
+          <label class="adv-checkbox-row">
+            <input type="checkbox" id="adv-trim">
+            <span data-i18n="adv_trim_label">Oříznout ticho na začátku/konci (s jemným fade in/out)</span>
+          </label>
+        </div>
+
+        <button type="button" class="adv-reset" id="adv-reset" data-i18n="adv_reset_btn">Obnovit výchozí hodnoty</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="card" id="process-card">
+    <h2 data-i18n="step3_kicker">Krok 3</h2>
+    <h3 data-i18n="step3_title">Zpracovat a stáhnout</h3>
+
+    <div class="process-row">
+      <button class="primary" id="process-btn" disabled data-i18n="process_btn">Zpracovat track</button>
+      <span class="status-line" id="status-line" data-i18n="status_idle">Nejdřív nahrajte WAV soubor.</span>
+    </div>
+
+    <div class="progress" id="progress"><div class="bar"></div></div>
+
+    <div class="results" id="results">
+      <div class="result-note" id="result-note" hidden></div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="label" data-i18n="stat_lufs">Hlasitost (LUFS)</div>
+          <div class="before" id="stat-lufs-before"></div>
+          <div class="after good" id="stat-lufs-after"></div>
+        </div>
+        <div class="stat">
+          <div class="label" data-i18n="stat_peak">Špička (True Peak)</div>
+          <div class="before" id="stat-peak-before"></div>
+          <div class="after good" id="stat-peak-after"></div>
+        </div>
+        <div class="stat">
+          <div class="label" data-i18n="stat_gain">Aplikovaný gain</div>
+          <div class="after" id="stat-gain"></div>
+        </div>
+        <div class="stat">
+          <div class="label" data-i18n="stat_preset">Předvolba</div>
+          <div class="after" id="stat-preset"></div>
+        </div>
+      </div>
+
+      <div class="wave-label" data-i18n="wave_before">Před</div>
+      <canvas class="wave" id="wave-before"></canvas>
+      <div class="wave-label" data-i18n="wave_after">Po</div>
+      <canvas class="wave" id="wave-after"></canvas>
+
+      <div class="ab-toggle" id="ab-toggle">
+        <span class="ab-label" data-i18n="ab_label">Poslech:</span>
+        <button type="button" class="ab-btn" id="ab-before" data-i18n="ab_before">🔈 Originál</button>
+        <button type="button" class="ab-btn selected" id="ab-after" data-i18n="ab_after">✨ Mastrováno</button>
+      </div>
+      <audio id="preview-audio" controls preload="metadata"></audio>
+
+      <div>
+        <a class="download-btn" id="download-link" download="mastered.wav">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M12 16l-4-4M12 16l4-4"/><path d="M4 20h16"/></svg>
+          <span data-i18n="download_btn">Stáhnout mastrovaný WAV</span>
+        </a>
+      </div>
+
+      <details class="tech">
+        <summary data-i18n="tech_summary">Technické detaily zpracování</summary>
+        <div id="tech-details" style="margin-top:8px;"></div>
+      </details>
+    </div>
+  </section>
+
+  <div class="promo-banner" id="promo-banner">
+    <span class="promo-icon" aria-hidden="true">🎧</span>
+    <div class="promo-body">
+      <div class="promo-tag" data-i18n="promo_tag">Tip od SYNTHLUCIDA</div>
+      <div class="promo-title" data-i18n="promo_title">RELAXPLAYER — hudební přehrávač pro klid a soustředění</div>
+      <div class="promo-text" data-i18n="promo_text">Až budete mít track mastrovaný, pusťte si ho (nebo cokoliv jiného) v RELAXPLAYERu — dalším nástroji z rodiny SYNTHLUCIDA.</div>
+    </div>
+    <a class="promo-cta" href="https://relaxplayer.eu" target="_blank" rel="noopener" data-i18n="promo_cta">Vyzkoušet RELAXPLAYER →</a>
+  </div>
+
+  <section class="card" id="how-card">
+    <h2 data-i18n="how_kicker">Jak to funguje</h2>
+    <h3 data-i18n="how_title">Co DZMASTER dělá s vaší stopou</h3>
+    <div class="faq">
+      <div class="q" data-i18n="how_q1">1. Analýza</div>
+      <div class="a" data-i18n="how_a1">Nástroj změří integrovanou hlasitost (LUFS podle ITU‑R BS.1770), špičkovou úroveň a dynamiku skladby.</div>
+      <div class="q" data-i18n="how_q2">2. Čištění a jemná komprese</div>
+      <div class="a" data-i18n="how_a2">Odstraní se stejnosměrná složka a neslyšitelný rachot pod 20 Hz, poté jemný "glue" kompresor (ve výchozím nastavení jednopásmový) mírně vyrovná dynamiku.</div>
+      <div class="q" data-i18n="how_q3">3. Vyrovnání hlasitosti</div>
+      <div class="a" data-i18n="how_a3">Track se zesílí nebo zeslabí na přesnou cílovou hlasitost zvolené předvolby.</div>
+      <div class="q" data-i18n="how_q4">4. Bezpečný limiter</div>
+      <div class="a" data-i18n="how_a4">Look-ahead limiter zajistí, že špičky nikdy nepřekročí bezpečný strop zvolené předvolby (−1 dBTP u většiny předvoleb, −1.5 dBTP u Vinylu a −3 dBTP u Podcastu/Audioknihy) — nedojde tak k ořezání ("clippingu") při přehrávání na streamovacích službách ani po kompresi do MP3/AAC.</div>
+      <div class="q" data-i18n="how_q5">5. Export</div>
+      <div class="a" data-i18n="how_a5">Výsledek se rovnou v prohlížeči zabalí do WAV souboru ke stažení. Nic se nikam neposílá ani neukládá.</div>
+      <div class="q" data-i18n="how_q6">6. Volitelné pokročilé funkce</div>
+      <div class="a" data-i18n="how_a6">V Pokročilém nastavení si navíc můžete zapnout: 3pásmový EQ (basy/středy/výšky), stereo šířku, vícepásmovou kompresi (basy, středy a výšky se komprimují zvlášť, takže hlasitý bas "nestahuje" výšky dolů), basy do mono pod zvolenou frekvencí (bezpečnější přehrávání na mono systémech a vinylu), jemnou saturaci pro harmonické zabarvení a oříznutí ticha na začátku/konci s jemným fade. Všechny jsou ve výchozím stavu vypnuté nebo neutrální a na výsledek nemají žádný vliv, dokud je sami nezapnete. (Při exportu do 16-bit se navíc automaticky použije jemný dithering, který sníží slyšitelné zkreslení od zaokrouhlování.)</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="fitem"><span data-i18n="footer_text">DZMASTER je součástí rodiny nástrojů SYNTHLUCIDA.</span></span>
+    <span class="fitem">· <a href="https://synthlucida.com/dzmaster/dzmaster-landing.html" id="footer-more" data-i18n="footer_more">O nástroji</a></span>
+    <span class="fitem">· <a href="https://synthlucida.com/dzmaster/dzmaster-privacy.html" id="footer-privacy" data-i18n="footer_privacy">Ochrana soukromí</a></span>
+    <span class="fitem">· <a href="https://synthlucida.com/index.html">SYNTHLUCIDA</a></span>
+  </div>
+</footer>
+
+<script type="text/plain" id="dzmaster-engine-src">
+
+/*!
+ * DZMASTER Engine v1.2
+ * Client-side automatic mastering DSP core.
+ * Pure JS, no DOM / Web Audio dependency -> runs identically in Node (for
+ * testing) and in the browser.
+ *
+ * Pipeline:
+ *   decode WAV -> analyze (integrated LUFS, true peak, crest factor)
+ *   -> DC removal -> 20Hz rumble high-pass -> reference-level pre-gain
+ *   -> optional EQ / width / mono bass / saturation
+ *   -> gentle glue compressor (single- or multiband)
+ *   -> loudness normalization to preset target through a true-peak
+ *      limiter, iterated until the LIMITED result lands on the target
+ *   -> final true-peak verification -> encode WAV
+ *
+ * Loudness measurement follows ITU-R BS.1770-4 (K-weighting + gated
+ * integration). True peak is measured with 4x polyphase windowed-sinc
+ * oversampling (the method BS.1770-4 Annex 2 describes), and the limiter
+ * detects on that same oversampled signal, so the published ceiling holds
+ * for inter-sample peaks too -- not just for the raw samples.
+ *
+ * v1.1 changes (all verified against ffmpeg's ebur128 meter):
+ *  - true-peak ceiling is now actually honored (v1.0's cubic estimate
+ *    under-read heavily limited material by up to ~2 dB)
+ *  - limited output now lands on the preset's LUFS target (v1.0 could miss
+ *    by 1.5-3 dB on Club/Bandcamp, because limiting lowers loudness after
+ *    the normalization gain had already been chosen)
+ *  - limiter attack is a smooth ramp instead of an instant gain step
+ *  - compression/saturation no longer depend on how loud the user
+ *    happened to export the mix (fixed reference level before dynamics)
+ *  - WAVE_FORMAT_EXTENSIBLE (e.g. 32-bit float from many DAWs) decodes
+ *  - in-place processing: ~3x lower peak memory on long tracks
+ *
+ * v1.2 changes (mastering output of every preset is bit-identical to v1.1
+ * except at the file edges described below, and when "trim silence" is on):
+ *  - a file that starts/ends in digital silence starts/ends on exact zero
+ *    again: the rumble high-pass rang on after an abrupt ending (a tick at
+ *    the end of playback); only input samples below -80 dBFS, max 50 ms
+ *  - trim silence: threshold relative to the track's peak (-60 dB) instead
+ *    of a fixed -50 dBFS, keeps 400 ms of decay / 20 ms of pre-roll and
+ *    fades only inside that padding (reverb tails and opening hits intact)
+ *  - RF64 / BW64 files decode (ds64 sizes honored)
+ *  - missing pad byte after an odd-sized chunk resolved via known chunk ids
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.DZMasterEngine = factory();
+  }
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  // ---------------------------------------------------------------------
+  // Presets
+  // ---------------------------------------------------------------------
+  // Sources (checked 2026-09): Spotify & YouTube normalize to -14 LUFS;
+  // Apple Music targets -16 LUFS; -1 dBTP ceiling is the common safe
+  // true-peak limit recommended across platforms to avoid inter-sample
+  // clipping after lossy encoding. Broadcast target follows EBU R128
+  // (-23 LUFS, mandatory across EU television/radio). Podcast/audiobook
+  // target follows the ACX submission spec (RMS -23 to -18 dB, peak <=
+  // -3 dBTP) -- landing in the middle of that window. Bandcamp/direct-
+  // download is louder on purpose: unlike streaming platforms, Bandcamp
+  // does not renormalize playback, so extra loudness here is not thrown
+  // away. Vinyl leaves extra true-peak headroom for the cutting process.
+  // Social/short-form follows the same -14-ish family most short-video
+  // platforms normalize to. Classical/acoustic uses the widest-dynamics
+  // target of the set.
+  var PRESETS = {
+    streaming: { id: 'streaming', targetLUFS: -14, ceilingDbTP: -1.0 },
+    apple: { id: 'apple', targetLUFS: -16, ceilingDbTP: -1.0 },
+    club: { id: 'club', targetLUFS: -9, ceilingDbTP: -1.0 },
+    broadcast: { id: 'broadcast', targetLUFS: -23, ceilingDbTP: -1.0 },
+    podcast: { id: 'podcast', targetLUFS: -19, ceilingDbTP: -3.0 },
+    bandcamp: { id: 'bandcamp', targetLUFS: -11, ceilingDbTP: -1.0 },
+    vinyl: { id: 'vinyl', targetLUFS: -14, ceilingDbTP: -1.5 },
+    social: { id: 'social', targetLUFS: -13, ceilingDbTP: -1.0 },
+    classical: { id: 'classical', targetLUFS: -18, ceilingDbTP: -1.0 },
+    // 'smart' has no fixed target -- resolved per-track by pickSmartTarget()
+    smart: { id: 'smart', targetLUFS: null, ceilingDbTP: -1.0 }
+  };
+
+  // Level the dynamics stages (saturation, glue/multiband compressor) are
+  // tuned for. The mix is brought here before them and taken to the preset
+  // target after them, so the SAME mix exported at -3 dBFS or at -12 dBFS
+  // peak now gets the same compression. -20 LUFS is roughly where a mix
+  // prepared per the in-app guide (peaks around -6..-3 dBFS) already sits,
+  // i.e. the compressor behaves exactly as tuned for well-prepared mixes.
+  var REFERENCE_LUFS = -20;
+  // Internal safety margin under the published ceiling for the limiter.
+  var LIMITER_MARGIN_DB = 0.5;
+  // How far past the plain normalization gain the loudness loop may push
+  // into the limiter to reach the target. Beyond this a very dynamic track
+  // would be crushed; the result then reports the loudness it really has.
+  var MAX_LIMITER_PUSH_DB = 6;
+  var LOUDNESS_TOLERANCE_DB = 0.1;
+  var LOUDNESS_MAX_ITERATIONS = 6;
+
+  function pickSmartTarget(crestFactorDb) {
+    // Crest factor = peak/RMS in dB. Low crest factor => already dense /
+    // loud material (EDM, club, hyper-compressed pop) => don't push it
+    // further, land closer to -11. High crest factor => dynamic, acoustic,
+    // classical-leaning material => preserve dynamics, land at -16.
+    // Everything in between gets the -14 streaming-safe default.
+    if (crestFactorDb <= 8) return -11;
+    if (crestFactorDb >= 18) return -16;
+    return -14;
+  }
+
+  function resolvePreset(presetId, crestFactorDb) {
+    var p = PRESETS[presetId];
+    if (!p) throw new Error('Unknown preset: ' + presetId);
+    var targetLUFS = p.targetLUFS;
+    if (presetId === 'smart') {
+      targetLUFS = pickSmartTarget(crestFactorDb);
+    }
+    return { id: p.id, targetLUFS: targetLUFS, ceilingDbTP: p.ceilingDbTP };
+  }
+
+  // ---------------------------------------------------------------------
+  // WAV decode / encode
+  // ---------------------------------------------------------------------
+  var WAVE_FORMAT_PCM = 1;
+  var WAVE_FORMAT_IEEE_FLOAT = 3;
+  var WAVE_FORMAT_EXTENSIBLE = 0xFFFE;
+
+  function wavError(code, message) {
+    var e = new Error(message);
+    e.code = code;
+    return e;
+  }
+
+  function fourCC(view, offset) {
+    return String.fromCharCode(
+      view.getUint8(offset), view.getUint8(offset + 1),
+      view.getUint8(offset + 2), view.getUint8(offset + 3)
+    );
+  }
+
+  function looksLikeChunkId(view, offset) {
+    if (offset < 0 || offset + 4 > view.byteLength) return false;
+    for (var i = 0; i < 4; i++) {
+      var b = view.getUint8(offset + i);
+      if (b < 0x20 || b > 0x7e) return false;
+    }
+    return true;
+  }
+
+  // Chunk ids real-world WAV writers use (DAWs, field recorders, BWF,
+  // RF64). Used to resolve a missing pad byte after an odd-sized chunk:
+  // a known id wins over the plain "4 printable bytes" guess, which a
+  // data-chunk size byte like 'P' (0x50) could fool.
+  var KNOWN_CHUNK_IDS = {
+    'fmt ': 1, 'data': 1, 'LIST': 1, 'JUNK': 1, 'junk': 1, 'bext': 1, 'fact': 1, 'cue ': 1,
+    'smpl': 1, 'inst': 1, 'id3 ': 1, 'ID3 ': 1, 'iXML': 1, 'PAD ': 1, 'FLLR': 1, 'acid': 1,
+    'strc': 1, 'umid': 1, 'minf': 1, 'elm1': 1, 'regn': 1, 'ds64': 1, '_PMX': 1, 'DISP': 1,
+    'PEAK': 1, 'levl': 1, 'axml': 1, 'chna': 1, 'cart': 1, 'plst': 1, 'labl': 1, 'afsp': 1,
+    'SyLp': 1, 'ResU': 1, 'akai': 1, 'MEXT': 1, 'ovwf': 1, 'ptrc': 1, 'dbmd': 1
+  };
+  function isKnownChunkAt(view, offset) {
+    return looksLikeChunkId(view, offset) && KNOWN_CHUNK_IDS[fourCC(view, offset)] === 1;
+  }
+  function shouldDropPadByte(view, next) {
+    if (isKnownChunkAt(view, next)) return false;
+    if (isKnownChunkAt(view, next - 1)) return true;
+    return !looksLikeChunkId(view, next) && looksLikeChunkId(view, next - 1);
+  }
+
+  // Resolves the effective sample format. WAVE_FORMAT_EXTENSIBLE (0xFFFE)
+  // stores the real format code in the first two bytes of the SubFormat
+  // GUID at byte 24 of the fmt chunk -- many DAWs write 24/32-bit and float
+  // files this way, so it has to be understood, not rejected.
+  function readFmtChunk(view, chunkStart, chunkSize) {
+    if (chunkSize < 16 || chunkStart + 16 > view.byteLength) {
+      throw wavError('BAD_FMT', 'WAV fmt chunk is too short.');
+    }
+    var fmt = {
+      audioFormat: view.getUint16(chunkStart, true),
+      numChannels: view.getUint16(chunkStart + 2, true),
+      sampleRate: view.getUint32(chunkStart + 4, true),
+      bitsPerSample: view.getUint16(chunkStart + 14, true)
+    };
+    fmt.formatCode = fmt.audioFormat;
+    if (fmt.audioFormat === WAVE_FORMAT_EXTENSIBLE) {
+      if (chunkSize >= 26 && chunkStart + 26 <= view.byteLength) {
+        fmt.formatCode = view.getUint16(chunkStart + 24, true);
+      } else {
+        fmt.formatCode = WAVE_FORMAT_PCM; // truncated extension: PCM is by far the most likely
+      }
+    }
+    return fmt;
+  }
+
+  function checkFormatSupported(fmt) {
+    var bits = fmt.bitsPerSample;
+    var ok = (fmt.formatCode === WAVE_FORMAT_PCM && (bits === 8 || bits === 16 || bits === 24 || bits === 32)) ||
+      (fmt.formatCode === WAVE_FORMAT_IEEE_FLOAT && (bits === 32 || bits === 64));
+    if (!ok) {
+      throw wavError('UNSUPPORTED_FORMAT', 'Unsupported WAV encoding: ' + bits + '-bit, format code ' + fmt.formatCode + '.');
+    }
+    if (fmt.numChannels < 1 || fmt.numChannels > 32) {
+      throw wavError('UNSUPPORTED_CHANNELS', 'Unsupported channel count: ' + fmt.numChannels);
+    }
+    if (!(fmt.sampleRate >= 8000 && fmt.sampleRate <= 768000)) {
+      throw wavError('UNSUPPORTED_RATE', 'Unsupported sample rate: ' + fmt.sampleRate + ' Hz');
+    }
+  }
+
+  function parseWav(arrayBuffer) {
+    var view = new DataView(arrayBuffer);
+    if (arrayBuffer.byteLength < 12) throw wavError('NOT_WAV', 'File too small to be a valid WAV file.');
+    var magic = fourCC(view, 0);
+    // RF64 / BW64 (EBU Tech 3306 / ITU-R BS.2088): same layout as RIFF, with
+    // the real 64-bit sizes in a 'ds64' chunk. Reaper, Nuendo, Pro Tools
+    // and many field recorders can write them.
+    if (magic !== 'RIFF' && magic !== 'RF64' && magic !== 'BW64') throw wavError('NOT_WAV', 'Not a RIFF/WAV file.');
+    if (fourCC(view, 8) !== 'WAVE') throw wavError('NOT_WAV', 'Not a WAVE file.');
+
+    var offset = 12;
+    var fmt = null;
+    var dataOffset = -1;
+    var dataLength = 0;
+    var ds64DataSize = -1;
+
+    while (offset + 8 <= view.byteLength) {
+      var chunkId = fourCC(view, offset);
+      var chunkSize = view.getUint32(offset + 4, true);
+      var chunkStart = offset + 8;
+
+      if (chunkId === 'ds64' && chunkSize >= 16 && chunkStart + 16 <= view.byteLength) {
+        ds64DataSize = view.getUint32(chunkStart + 8, true) + view.getUint32(chunkStart + 12, true) * 4294967296;
+      } else if (chunkId === 'fmt ') {
+        fmt = readFmtChunk(view, chunkStart, chunkSize);
+      } else if (chunkId === 'data') {
+        dataOffset = chunkStart;
+        var remaining = view.byteLength - chunkStart;
+        if (chunkSize === 0xFFFFFFFF && ds64DataSize >= 0) chunkSize = ds64DataSize;
+        // 0 / 0xFFFFFFFF = size never finalized (interrupted recording,
+        // streamed/piped export) and a size past EOF = truncated file:
+        // take whatever audio is actually there instead of failing.
+        dataLength = (chunkSize === 0 || chunkSize === 0xFFFFFFFF || chunkSize > remaining) ? remaining : chunkSize;
+        if (fmt) break; // everything needed is known; skip trailing metadata
+      }
+
+      // Chunks are word (2-byte) aligned. Some writers forget the pad byte
+      // after an odd-sized chunk -- tolerate that instead of misreading
+      // every chunk after it. A zero-size chunk is legal (still advances).
+      var next = chunkStart + chunkSize + (chunkSize % 2);
+      if ((chunkSize % 2) && shouldDropPadByte(view, next)) next -= 1;
+      offset = next;
+    }
+
+    if (!fmt) throw wavError('NO_FMT', 'WAV file has no fmt chunk.');
+    if (dataOffset < 0) throw wavError('NO_DATA', 'WAV file has no data chunk.');
+    checkFormatSupported(fmt);
+
+    var numChannels = fmt.numChannels;
+    var bitsPerSample = fmt.bitsPerSample;
+    var bytesPerSample = bitsPerSample / 8;
+    var frameCount = Math.floor(dataLength / (bytesPerSample * numChannels));
+
+    var channels = [];
+    for (var c = 0; c < numChannels; c++) channels.push(new Float32Array(frameCount));
+
+    var readSample;
+    var isFloat = fmt.formatCode === WAVE_FORMAT_IEEE_FLOAT;
+    if (isFloat && bitsPerSample === 32) {
+      readSample = function (o) { return view.getFloat32(o, true); };
+    } else if (isFloat && bitsPerSample === 64) {
+      readSample = function (o) { return view.getFloat64(o, true); };
+    } else if (bitsPerSample === 16) {
+      readSample = function (o) { return view.getInt16(o, true) / 32768; };
+    } else if (bitsPerSample === 24) {
+      readSample = function (o) {
+        var b0 = view.getUint8(o), b1 = view.getUint8(o + 1), b2 = view.getUint8(o + 2);
+        var val = b0 | (b1 << 8) | (b2 << 16);
+        if (val & 0x800000) val -= 0x1000000;
+        return val / 8388608;
+      };
+    } else if (bitsPerSample === 32) {
+      readSample = function (o) { return view.getInt32(o, true) / 2147483648; };
+    } else {
+      readSample = function (o) { return (view.getUint8(o) - 128) / 128; };
+    }
+
+    var pos = dataOffset;
+    for (var i = 0; i < frameCount; i++) {
+      for (var ch = 0; ch < numChannels; ch++) {
+        var s = readSample(pos);
+        // Float files may carry NaN/Inf from a broken plugin -- never let
+        // that poison every filter state downstream.
+        channels[ch][i] = (s === s && s !== Infinity && s !== -Infinity) ? s : 0;
+        pos += bytesPerSample;
+      }
+    }
+
+    return { sampleRate: fmt.sampleRate, numChannels: numChannels, frameCount: frameCount, channels: channels };
+  }
+
+  // Fast xorshift32 uniform [0,1) source for dither noise: statistically
+  // plenty for TPDF dither and several times cheaper than Math.random over
+  // the ~2 draws per sample a multi-minute export needs.
+  var ditherState = 0x9E3779B9;
+  function fastRandom() {
+    var x = ditherState | 0;
+    x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
+    ditherState = x >>> 0;
+    return ditherState / 4294967296;
+  }
+
+  var HOST_LITTLE_ENDIAN = (function () {
+    var b = new ArrayBuffer(2);
+    new DataView(b).setInt16(0, 1, true);
+    return new Int16Array(b)[0] === 1;
+  })();
+
+  function encodeWav(channels, sampleRate, bitsPerSample, opts) {
+    bitsPerSample = bitsPerSample || 16;
+    if (bitsPerSample !== 16 && bitsPerSample !== 24) {
+      throw new Error('encodeWav only supports 16 or 24 bit output.');
+    }
+    opts = opts || {};
+    // Off by default -- this only changes behavior when a caller opts in,
+    // so every existing call site (including exact round-trip tests) is
+    // byte-for-byte unaffected. TPDF dither (sum of two independent
+    // uniform[0,1) draws, triangular over (-1,1)) softens the harsh,
+    // signal-correlated distortion that plain rounding can add on quiet
+    // passages, at the cost of a tiny, inaudible noise floor.
+    // `opts.rng` lets tests substitute a deterministic generator.
+    var dither = !!opts.dither;
+    var rng = opts.rng || fastRandom;
+    var numChannels = channels.length;
+    if (numChannels < 1) throw new Error('encodeWav needs at least one channel.');
+    var frameCount = channels[0].length;
+    var bytesPerSample = bitsPerSample / 8;
+    var blockAlign = numChannels * bytesPerSample;
+    var dataSize = frameCount * blockAlign;
+
+    var buffer = new ArrayBuffer(44 + dataSize);
+    var view = new DataView(buffer);
+
+    function writeStr(o, s) { for (var i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); }
+
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + dataSize, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitsPerSample, true);
+    writeStr(36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    var maxPos = bitsPerSample === 16 ? 32767 : 8388607;
+    var maxNeg = bitsPerSample === 16 ? -32768 : -8388608;
+    // Typed-array writes instead of a DataView call per byte: same bytes,
+    // several times faster on multi-minute tracks.
+    var i16 = (bitsPerSample === 16 && HOST_LITTLE_ENDIAN) ? new Int16Array(buffer, 44, frameCount * numChannels) : null;
+    var u8 = new Uint8Array(buffer);
+    var offset = 44;
+    var k = 0;
+
+    for (var i = 0; i < frameCount; i++) {
+      for (var c = 0; c < numChannels; c++) {
+        var s = channels[c][i];
+        if (!isFinite(s)) s = 0; // NaN/Infinity safety net -- never write garbage samples
+        if (s > 1) s = 1; else if (s < -1) s = -1;
+        var scaled = s * (s < 0 ? -maxNeg : maxPos);
+        if (dither) scaled += rng() - rng(); // TPDF, +-1 LSB triangular
+        var val = Math.round(scaled);
+        if (val > maxPos) val = maxPos;
+        if (val < maxNeg) val = maxNeg;
+
+        if (i16) {
+          i16[k++] = val;
+        } else if (bitsPerSample === 16) {
+          view.setInt16(offset, val, true);
+          offset += 2;
+        } else {
+          if (val < 0) val += 0x1000000;
+          u8[offset] = val & 0xff;
+          u8[offset + 1] = (val >> 8) & 0xff;
+          u8[offset + 2] = (val >> 16) & 0xff;
+          offset += 3;
+        }
+      }
+    }
+
+    return buffer;
+  }
+
+  // ---------------------------------------------------------------------
+  // Biquad filter (RBJ Audio EQ Cookbook formulas) -- used both for the
+  // K-weighting loudness filters and for the rumble high-pass in the
+  // processing chain. Parameterized by sample rate, so it is correct at
+  // 44.1kHz, 48kHz, 96kHz etc without a lookup table.
+  // ---------------------------------------------------------------------
+  function makeBiquad(type, fc, Q, gainDb, sampleRate) {
+    // Keep the corner safely below Nyquist: at low sample rates (a 16 kHz
+    // voice recording, say) an 8 kHz treble shelf would otherwise sit
+    // exactly on Nyquist and produce a degenerate filter.
+    var nyq = sampleRate / 2;
+    if (fc > nyq * 0.9) fc = nyq * 0.9;
+    var A = Math.pow(10, gainDb / 40);
+    var w0 = 2 * Math.PI * (fc / sampleRate);
+    var cosw0 = Math.cos(w0);
+    var sinw0 = Math.sin(w0);
+    var alpha = sinw0 / (2 * Q);
+    var b0, b1, b2, a0, a1, a2;
+
+    if (type === 'highshelf') {
+      var sqrtA = Math.sqrt(A);
+      b0 = A * ((A + 1) + (A - 1) * cosw0 + 2 * sqrtA * alpha);
+      b1 = -2 * A * ((A - 1) + (A + 1) * cosw0);
+      b2 = A * ((A + 1) + (A - 1) * cosw0 - 2 * sqrtA * alpha);
+      a0 = (A + 1) - (A - 1) * cosw0 + 2 * sqrtA * alpha;
+      a1 = 2 * ((A - 1) - (A + 1) * cosw0);
+      a2 = (A + 1) - (A - 1) * cosw0 - 2 * sqrtA * alpha;
+    } else if (type === 'lowshelf') {
+      var sqrtA2 = Math.sqrt(A);
+      b0 = A * ((A + 1) - (A - 1) * cosw0 + 2 * sqrtA2 * alpha);
+      b1 = 2 * A * ((A - 1) - (A + 1) * cosw0);
+      b2 = A * ((A + 1) - (A - 1) * cosw0 - 2 * sqrtA2 * alpha);
+      a0 = (A + 1) + (A - 1) * cosw0 + 2 * sqrtA2 * alpha;
+      a1 = -2 * ((A - 1) + (A + 1) * cosw0);
+      a2 = (A + 1) + (A - 1) * cosw0 - 2 * sqrtA2 * alpha;
+    } else if (type === 'peaking') {
+      b0 = 1 + alpha * A;
+      b1 = -2 * cosw0;
+      b2 = 1 - alpha * A;
+      a0 = 1 + alpha / A;
+      a1 = -2 * cosw0;
+      a2 = 1 - alpha / A;
+    } else if (type === 'highpass') {
+      b0 = (1 + cosw0) / 2;
+      b1 = -(1 + cosw0);
+      b2 = (1 + cosw0) / 2;
+      a0 = 1 + alpha;
+      a1 = -2 * cosw0;
+      a2 = 1 - alpha;
+    } else if (type === 'lowpass') {
+      b0 = (1 - cosw0) / 2;
+      b1 = 1 - cosw0;
+      b2 = (1 - cosw0) / 2;
+      a0 = 1 + alpha;
+      a1 = -2 * cosw0;
+      a2 = 1 - alpha;
+    } else {
+      throw new Error('Unknown biquad type: ' + type);
+    }
+
+    return {
+      b0: b0 / a0, b1: b1 / a0, b2: b2 / a0,
+      a1: a1 / a0, a2: a2 / a0
+    };
+  }
+
+  // Direct Form I biquad writing into `out` (may be the same array as
+  // `input` -- each input sample is read before its slot is overwritten).
+  function runBiquad(input, out, coef) {
+    var x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+    var b0 = coef.b0, b1 = coef.b1, b2 = coef.b2, a1 = coef.a1, a2 = coef.a2;
+    for (var i = 0; i < input.length; i++) {
+      var x0 = input[i];
+      var y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
+      out[i] = y0;
+      x2 = x1; x1 = x0;
+      y2 = y1; y1 = y0;
+    }
+    return out;
+  }
+
+  // Returns a NEW Float32Array (never mutates the input -- callers rely on that).
+  function applyBiquad(input, coef) {
+    return runBiquad(input, new Float32Array(input.length), coef);
+  }
+
+  function applyBiquadInPlace(chan, coef) {
+    return runBiquad(chan, chan, coef);
+  }
+
+  function copyChannels(channels) {
+    return channels.map(function (c) { return new Float32Array(c); });
+  }
+
+  function scaleInPlace(channels, gainLin) {
+    if (gainLin === 1) return channels;
+    for (var c = 0; c < channels.length; c++) {
+      var chan = channels[c];
+      for (var i = 0; i < chan.length; i++) chan[i] *= gainLin;
+    }
+    return channels;
+  }
+
+  // ---------------------------------------------------------------------
+  // ITU-R BS.1770-4 loudness measurement
+  // ---------------------------------------------------------------------
+  // Channel weighting per BS.1770 for the usual WAV channel orders:
+  // mono/stereo all 1.0; 5.0 = L R C Ls Rs; 5.1 = L R C LFE Ls Rs (LFE is
+  // excluded from the measurement).
+  function channelWeight(numChannels, idx) {
+    if (numChannels <= 2) return 1.0;
+    if (numChannels === 6) return idx === 3 ? 0 : ((idx === 4 || idx === 5) ? 1.41 : 1.0);
+    if (numChannels === 5) return (idx === 3 || idx === 4) ? 1.41 : 1.0;
+    return 1.0;
+  }
+
+  function gatedLoudnessFromBlocks(blockLoudness) {
+    // Absolute gate at -70 LUFS
+    var ABS_GATE_LUFS = -70.0;
+    var absGated = blockLoudness.filter(function (z) {
+      return z > 0 && (-0.691 + 10 * Math.log10(z)) > ABS_GATE_LUFS;
+    });
+    if (absGated.length === 0) return -Infinity; // effectively silent track
+
+    var meanAbs = absGated.reduce(function (a, b) { return a + b; }, 0) / absGated.length;
+    var relativeThreshold = -0.691 + 10 * Math.log10(meanAbs) - 10.0;
+
+    var relGated = absGated.filter(function (z) {
+      return (-0.691 + 10 * Math.log10(z)) > relativeThreshold;
+    });
+    if (relGated.length === 0) relGated = absGated; // safety net
+
+    var meanRel = relGated.reduce(function (a, b) { return a + b; }, 0) / relGated.length;
+    if (meanRel <= 0) return -Infinity;
+    return -0.691 + 10 * Math.log10(meanRel);
+  }
+
+  // Returns integrated loudness in LUFS, or -Infinity for digital silence.
+  // K-weighting runs inline and squares are accumulated per 100 ms step,
+  // so 400 ms blocks (75% overlap) are sums of 4 steps: one pass, no
+  // filtered copies of the track in memory, each sample touched once.
+  function integratedLoudness(channels, sampleRate) {
+    var numChannels = channels.length;
+    var frameCount = channels[0].length;
+    if (frameCount === 0) return -Infinity;
+    var shelf = makeBiquad('highshelf', 1500.0, Math.SQRT1_2, 4.0, sampleRate);
+    var hp = makeBiquad('highpass', 38.0, 0.5, 0.0, sampleRate);
+    var stepSize = Math.round(0.1 * sampleRate);
+    var numSteps = Math.floor(frameCount / stepSize);
+    var singleBlock = numSteps < 4 || frameCount < Math.round(0.4 * sampleRate);
+    // File shorter than one gating block (400ms): a single whole-buffer
+    // measurement. Rare (very short stingers) but must not crash.
+    var span = singleBlock ? frameCount : numSteps * stepSize;
+    var slots = singleBlock ? 1 : numSteps;
+    var stepSums = new Float64Array(slots);
+
+    for (var c = 0; c < numChannels; c++) {
+      var w = channelWeight(numChannels, c);
+      if (w === 0) continue;
+      var chan = channels[c];
+      var sx1 = 0, sx2 = 0, sy1 = 0, sy2 = 0;
+      var hx1 = 0, hx2 = 0, hy1 = 0, hy2 = 0;
+      var acc = 0, inStep = 0, s = 0;
+      var stepLen = singleBlock ? frameCount : stepSize;
+      for (var i = 0; i < span; i++) {
+        var x0 = chan[i];
+        var y0 = shelf.b0 * x0 + shelf.b1 * sx1 + shelf.b2 * sx2 - shelf.a1 * sy1 - shelf.a2 * sy2;
+        sx2 = sx1; sx1 = x0; sy2 = sy1; sy1 = y0;
+        var z0 = hp.b0 * y0 + hp.b1 * hx1 + hp.b2 * hx2 - hp.a1 * hy1 - hp.a2 * hy2;
+        hx2 = hx1; hx1 = y0; hy2 = hy1; hy1 = z0;
+        acc += z0 * z0;
+        if (++inStep === stepLen) { stepSums[s++] += w * acc; acc = 0; inStep = 0; }
+      }
+    }
+
+    var blockLoudness = [];
+    if (singleBlock) {
+      blockLoudness.push(stepSums[0] / frameCount);
+    } else {
+      var blockLen = 4 * stepSize;
+      for (var j = 0; j + 4 <= numSteps; j++) {
+        blockLoudness.push((stepSums[j] + stepSums[j + 1] + stepSums[j + 2] + stepSums[j + 3]) / blockLen);
+      }
+    }
+    if (blockLoudness.length === 0) return -Infinity;
+    return gatedLoudnessFromBlocks(blockLoudness);
+  }
+
+  // ---------------------------------------------------------------------
+  // True peak (4x polyphase oversampling) and sample peak
+  // ---------------------------------------------------------------------
+  function samplePeak(channels) {
+    var peak = 0;
+    for (var c = 0; c < channels.length; c++) {
+      var chan = channels[c];
+      for (var i = 0; i < chan.length; i++) {
+        var a = chan[i] < 0 ? -chan[i] : chan[i];
+        if (a > peak) peak = a;
+      }
+    }
+    return peak;
+  }
+
+  function besselI0(x) {
+    var sum = 1, term = 1, h = x / 2;
+    for (var k = 1; k < 60; k++) {
+      term *= (h / k) * (h / k);
+      sum += term;
+      if (term < 1e-14 * sum) break;
+    }
+    return sum;
+  }
+
+  // Kaiser-windowed-sinc interpolation bank: phase p gives the value at
+  // i + p/4 from samples i-15 .. i+16 (32 taps, flat to ~0.44*fs, i.e.
+  // ~19.5 kHz at 44.1 kHz -- shorter filters under-read bright material). `l1` is
+  // the largest sum of absolute tap values -- the most any interpolated
+  // point can exceed the largest nearby sample by, which lets regions that
+  // can't matter be skipped with no loss of accuracy.
+  var TP_OS = 4, TP_TAPS = 32, TP_BANK = null;
+  function getTruePeakBank() {
+    if (TP_BANK) return TP_BANK;
+    var half = TP_TAPS / 2, beta = 8.0, i0b = besselI0(beta);
+    var h = [];
+    var l1 = 0;
+    for (var p = 1; p < TP_OS; p++) {
+      var frac = p / TP_OS, sum = 0, k;
+      var taps = new Float64Array(TP_TAPS);
+      for (k = 0; k < TP_TAPS; k++) {
+        var x = (k - half + 1) - frac;
+        var sinc = x === 0 ? 1 : Math.sin(Math.PI * x) / (Math.PI * x);
+        var r = x / half;
+        var win = besselI0(beta * Math.sqrt(Math.max(0, 1 - r * r))) / i0b;
+        taps[k] = sinc * win;
+        sum += taps[k];
+      }
+      var a = 0;
+      for (k = 0; k < TP_TAPS; k++) { taps[k] /= sum; a += Math.abs(taps[k]); }
+      if (a > l1) l1 = a;
+      h.push(taps);
+    }
+    TP_BANK = { h: h, half: half, n: TP_TAPS, l1: l1 * 1.0001 };
+    return TP_BANK;
+  }
+
+  var TP_BLOCK = 256;
+
+  // Per-block max |sample| over all channels, and the same widened to the
+  // neighbouring blocks (covers the filter's +-16 sample reach).
+  function blockNeighbourhoodMaxima(channels) {
+    var n = channels[0].length;
+    var nb = Math.ceil(n / TP_BLOCK);
+    var bmax = new Float32Array(nb);
+    for (var c = 0; c < channels.length; c++) {
+      var chan = channels[c];
+      for (var b = 0; b < nb; b++) {
+        var end = Math.min(n, (b + 1) * TP_BLOCK), m = bmax[b];
+        for (var i = b * TP_BLOCK; i < end; i++) {
+          var a = chan[i] < 0 ? -chan[i] : chan[i];
+          if (a > m) m = a;
+        }
+        bmax[b] = m;
+      }
+    }
+    var nbm = new Float32Array(nb);
+    for (var q = 0; q < nb; q++) {
+      var mm = bmax[q];
+      if (q > 0 && bmax[q - 1] > mm) mm = bmax[q - 1];
+      if (q + 1 < nb && bmax[q + 1] > mm) mm = bmax[q + 1];
+      nbm[q] = mm;
+    }
+    return { bmax: bmax, nbm: nbm };
+  }
+
+  // Interpolated (4x) peaks between frames i and i+1 for i in [s, e) of one
+  // channel -- all three phases from one pass over the taps. Raises det[i]
+  // when `det` is given, otherwise returns the running max `best`.
+  function interpBlock(chan, s, e, n, bank, det, best) {
+    var h1 = bank.h[0], h2 = bank.h[1], h3 = bank.h[2], T = bank.n, off = bank.half - 1;
+    for (var i = s; i < e; i++) {
+      var st = i - off, v1 = 0, v2 = 0, v3 = 0, k, x;
+      if (st >= 0 && st + T <= n) {
+        for (k = 0; k < T; k++) { x = chan[st + k]; v1 += h1[k] * x; v2 += h2[k] * x; v3 += h3[k] * x; }
+      } else {
+        for (k = 0; k < T; k++) {
+          var j = st + k;
+          if (j >= 0 && j < n) { x = chan[j]; v1 += h1[k] * x; v2 += h2[k] * x; v3 += h3[k] * x; }
+        }
+      }
+      if (v1 < 0) v1 = -v1;
+      if (v2 < 0) v2 = -v2;
+      if (v3 < 0) v3 = -v3;
+      var m = v1 > v2 ? v1 : v2;
+      if (v3 > m) m = v3;
+      if (det) { if (m > det[i]) det[i] = m; } else if (m > best) best = m;
+    }
+    return best;
+  }
+
+  // Lazy per-frame true-peak detector for the limiter. det[i] starts as the
+  // max |sample| across channels; ensure(gate) upgrades it to the true
+  // (interpolated) peak in every block whose neighbourhood could possibly
+  // reach `gate`. Blocks that provably can't are never interpolated, and
+  // blocks already done are never redone when a later loudness iteration
+  // raises the gain.
+  function makeTruePeakDetector(channels) {
+    var bank = getTruePeakBank();
+    var n = channels[0].length;
+    var det = new Float32Array(n);
+    for (var c = 0; c < channels.length; c++) {
+      var chan = channels[c];
+      for (var i = 0; i < n; i++) {
+        var a = chan[i] < 0 ? -chan[i] : chan[i];
+        if (a > det[i]) det[i] = a;
+      }
+    }
+    var nbm = blockNeighbourhoodMaxima(channels).nbm;
+    var done = new Uint8Array(nbm.length);
+    return {
+      det: det,
+      ensure: function (gateLin) {
+        for (var b = 0; b < nbm.length; b++) {
+          if (done[b] || nbm[b] * bank.l1 <= gateLin) continue;
+          var s = b * TP_BLOCK, e = Math.min(n, s + TP_BLOCK);
+          for (var c2 = 0; c2 < channels.length; c2++) interpBlock(channels[c2], s, e, n, bank, det, 0);
+          done[b] = 1;
+        }
+        return det;
+      }
+    };
+  }
+
+  function truePeakDetector(channels, gateLin) {
+    return makeTruePeakDetector(channels).ensure(gateLin);
+  }
+
+  // True-peak meter (linear). Loudest neighbourhoods first; stops as soon
+  // as no remaining block can beat the best value found.
+  function truePeak(channels) {
+    var n = channels[0].length;
+    if (n === 0) return 0;
+    var bank = getTruePeakBank();
+    var bm = blockNeighbourhoodMaxima(channels);
+    var nb = bm.nbm.length, nbm = bm.nbm;
+    var best = 0;
+    var order = new Array(nb);
+    for (var b = 0; b < nb; b++) {
+      if (bm.bmax[b] > best) best = bm.bmax[b];
+      order[b] = b;
+    }
+    if (best === 0) return 0;
+    order.sort(function (x, y) { return nbm[y] - nbm[x]; });
+    for (var q = 0; q < nb; q++) {
+      var bb = order[q];
+      if (nbm[bb] * bank.l1 <= best) break;
+      var s = bb * TP_BLOCK, e = Math.min(n, s + TP_BLOCK);
+      for (var c = 0; c < channels.length; c++) best = interpBlock(channels[c], s, e, n, bank, null, best);
+    }
+    return best;
+  }
+
+  function linearToDb(x) {
+    if (x <= 0) return -Infinity;
+    return 20 * Math.log10(x);
+  }
+  function dbToLinear(db) {
+    return Math.pow(10, db / 20);
+  }
+
+  function rms(channels) {
+    var sum = 0, n = 0;
+    for (var c = 0; c < channels.length; c++) {
+      var chan = channels[c];
+      for (var i = 0; i < chan.length; i++) { sum += chan[i] * chan[i]; n++; }
+    }
+    if (n === 0) return 0;
+    return Math.sqrt(sum / n);
+  }
+
+  function crestFactorDb(channels) {
+    var peak = samplePeak(channels);
+    var r = rms(channels);
+    if (r <= 0 || peak <= 0) return 20; // treat silence/degenerate as "dynamic" -> safe default
+    return linearToDb(peak) - linearToDb(r);
+  }
+
+  // ---------------------------------------------------------------------
+  // Gentle glue compressor: feed-forward, smoothed peak detector (in dB),
+  // soft-knee. Same gain-reduction curve is computed from the linked
+  // (max-across-channels) envelope and applied identically to every
+  // channel so the stereo image is preserved. opts.inPlace overwrites the
+  // input instead of allocating (safe: each frame is read before written).
+  // ---------------------------------------------------------------------
+  function glueCompress(channels, sampleRate, opts) {
+    opts = opts || {};
+    var thresholdDb = opts.thresholdDb != null ? opts.thresholdDb : -24;
+    var ratio = opts.ratio != null ? opts.ratio : 1.8;
+    var kneeDb = opts.kneeDb != null ? opts.kneeDb : 6;
+    var attackMs = opts.attackMs != null ? opts.attackMs : 15;
+    var releaseMs = opts.releaseMs != null ? opts.releaseMs : 250;
+    var makeupDb = opts.makeupDb != null ? opts.makeupDb : 0;
+
+    var n = channels[0].length;
+    var numChannels = channels.length;
+    var attackCoef = Math.exp(-1 / (0.001 * attackMs * sampleRate));
+    var releaseCoef = Math.exp(-1 / (0.001 * releaseMs * sampleRate));
+
+    var out;
+    if (opts.inPlace) {
+      out = channels;
+    } else {
+      out = [];
+      for (var c = 0; c < numChannels; c++) out.push(new Float32Array(n));
+    }
+
+    var envDb = -100; // running detector level in dB
+    var makeupLin = dbToLinear(makeupDb);
+
+    for (var i = 0; i < n; i++) {
+      // Linked detector: max instantaneous abs sample across channels this frame.
+      var maxAbs = 0;
+      for (var c2 = 0; c2 < numChannels; c2++) {
+        var a = Math.abs(channels[c2][i]);
+        if (a > maxAbs) maxAbs = a;
+      }
+      var inDb = maxAbs > 0 ? linearToDb(maxAbs) : -100;
+
+      // Smooth the detector (simple one-pole attack/release follower).
+      if (inDb > envDb) {
+        envDb = attackCoef * envDb + (1 - attackCoef) * inDb;
+      } else {
+        envDb = releaseCoef * envDb + (1 - releaseCoef) * inDb;
+      }
+
+      // Soft-knee gain computer (Giannoulis/Massberg/Reiss). Within the
+      // knee the reduction is (1 - 1/ratio) * (over + knee/2)^2 / (2*knee)
+      // -- note (1 - 1/ratio), NOT (1/ratio - 1): the wrong sign made this
+      // branch disagree with the linear branch at the knee edge (a ~2.7 dB
+      // gain snap on one sample, audible as clicking). This form is
+      // continuous with both neighbouring regions.
+      var over = envDb - thresholdDb;
+      var gainReductionDb = 0;
+      if (over > kneeDb / 2) {
+        gainReductionDb = over - over / ratio;
+      } else if (over > -kneeDb / 2) {
+        var kneeX = over + kneeDb / 2;
+        gainReductionDb = (1 - 1 / ratio) * (kneeX * kneeX) / (2 * kneeDb);
+      }
+      var gainLin = gainReductionDb === 0 ? makeupLin : dbToLinear(-gainReductionDb) * makeupLin;
+
+      for (var c3 = 0; c3 < numChannels; c3++) {
+        out[c3][i] = channels[c3][i] * gainLin;
+      }
+    }
+
+    return out;
+  }
+
+  // ---------------------------------------------------------------------
+  // True-peak brickwall limiter, linked across channels.
+  //
+  //  need[j]  gain that sample j needs so its TRUE peak (det) * gain stays
+  //           under the ceiling
+  //  h[k]     minimum of need over [k-W, k+L+W)   (look-ahead hold)
+  //  r[k]     h with a smooth exponential release (always <= h)
+  //  g[t]     average of r over [t-L+1, t]         (smooth attack ramp)
+  //
+  // Averaging only values that are each <= every need in [t-W, t+W]
+  // keeps g[t] <= need there, so no frame -- nor the interpolated signal
+  // around it -- goes over, while the gain glides down over the look-ahead
+  // window instead of stepping (a step is an audible click; v1.0 did that).
+  // Writes src * gainLin * g into `out` (preallocated, may not alias src).
+  // ---------------------------------------------------------------------
+  function limitTruePeak(src, det, gainLin, ceilingLin, sampleRate, out, opts) {
+    opts = opts || {};
+    var lookaheadMs = opts.lookaheadMs != null ? opts.lookaheadMs : 5;
+    var releaseMs = opts.releaseMs != null ? opts.releaseMs : 60;
+    var n = src[0].length;
+    var numChannels = src.length;
+    var L = Math.max(1, Math.round(0.001 * lookaheadMs * sampleRate));
+    var W = getTruePeakBank().half + 1;
+    var rc = Math.exp(-1 / (0.001 * releaseMs * sampleRate));
+    var cap = L + 2 * W + 2;
+    var dqIdx = new Int32Array(cap), dqVal = new Float64Array(cap);
+    var head = 0, size = 0, nextPush = 0;
+    var box = new Float64Array(L), boxSum = 0, boxPos = 0;
+    var r = 1.0;
+    var minGain = 1.0;
+
+    for (var k = -(L - 1); k < n; k++) {
+      var right = k + L + W - 1;
+      while (nextPush <= right && nextPush < n) {
+        var d = det[nextPush] * gainLin;
+        var v = d > ceilingLin ? ceilingLin / d : 1.0;
+        while (size > 0) {
+          var backPos = head + size - 1; if (backPos >= cap) backPos -= cap;
+          if (dqVal[backPos] >= v) size--; else break;
+        }
+        var pos = head + size; if (pos >= cap) pos -= cap;
+        dqIdx[pos] = nextPush; dqVal[pos] = v; size++;
+        nextPush++;
+      }
+      var left = k - W;
+      while (size > 0 && dqIdx[head] < left) { head++; if (head === cap) head = 0; size--; }
+      var h = size > 0 ? dqVal[head] : 1.0;
+      if (h < r) r = h; else r = rc * r + (1 - rc) * h;
+      boxSum += r - box[boxPos]; box[boxPos] = r; boxPos++; if (boxPos === L) boxPos = 0;
+      if (k >= 0) {
+        var g = boxSum / L;
+        if (g > 1) g = 1;
+        if (g < minGain) minGain = g;
+        var gl = g * gainLin;
+        for (var c = 0; c < numChannels; c++) out[c][k] = src[c][k] * gl;
+      }
+    }
+    return { maxReductionDb: -linearToDb(minGain) };
+  }
+
+  // Back-compat wrapper (v1.0 signature): returns new, limited channels.
+  function limit(channels, sampleRate, ceilingLin, opts) {
+    var det = truePeakDetector(channels, ceilingLin);
+    var out = channels.map(function (c) { return new Float32Array(c.length); });
+    limitTruePeak(channels, det, 1, ceilingLin, sampleRate, out, opts);
+    return out;
+  }
+
+  // ---------------------------------------------------------------------
+  // Optional "Advanced" processing steps -- all strict no-ops at their
+  // default/neutral settings. Each has an in-place form (used by master()
+  // to keep memory flat) and a pure form that never mutates its input.
+  // ---------------------------------------------------------------------
+
+  // 3-band tone EQ: low shelf (bass), mid bell (mid), high shelf (treble).
+  function toneEQBands(opts) {
+    opts = opts || {};
+    function clampDb(v) { v = v || 0; if (v > 12) v = 12; if (v < -12) v = -12; return v; }
+    return { bassDb: clampDb(opts.bassDb), midDb: clampDb(opts.midDb), trebleDb: clampDb(opts.trebleDb) };
+  }
+  function applyToneEQInPlace(channels, sampleRate, opts) {
+    var bands = toneEQBands(opts);
+    var coefs = [];
+    if (bands.bassDb !== 0) coefs.push(makeBiquad('lowshelf', 120, Math.SQRT1_2, bands.bassDb, sampleRate));
+    if (bands.midDb !== 0) coefs.push(makeBiquad('peaking', 1000, 1.0, bands.midDb, sampleRate));
+    if (bands.trebleDb !== 0) coefs.push(makeBiquad('highshelf', 8000, Math.SQRT1_2, bands.trebleDb, sampleRate));
+    coefs.forEach(function (coef) { channels.forEach(function (chan) { applyBiquadInPlace(chan, coef); }); });
+    return channels;
+  }
+  function applyToneEQ(channels, sampleRate, opts) {
+    var b = toneEQBands(opts);
+    if (b.bassDb === 0 && b.midDb === 0 && b.trebleDb === 0) return channels;
+    return applyToneEQInPlace(copyChannels(channels), sampleRate, opts);
+  }
+
+  // Stereo width via mid/side scaling: 100 = unchanged, 0 = fully mono,
+  // 200 = doubled side signal. No-op for mono input or width===100.
+  function clampWidth(widthPct) {
+    if (widthPct == null || !isFinite(widthPct)) widthPct = 100;
+    if (widthPct < 0) widthPct = 0;
+    if (widthPct > 200) widthPct = 200;
+    return widthPct;
+  }
+  function applyStereoWidthInPlace(channels, widthPct) {
+    widthPct = clampWidth(widthPct);
+    if (channels.length !== 2 || widthPct === 100) return channels;
+    var width = widthPct / 100;
+    var L = channels[0], R = channels[1];
+    for (var i = 0; i < L.length; i++) {
+      var mid = (L[i] + R[i]) * 0.5;
+      var side = (L[i] - R[i]) * 0.5 * width;
+      L[i] = mid + side;
+      R[i] = mid - side;
+    }
+    return channels;
+  }
+  function applyStereoWidth(channels, widthPct) {
+    if (channels.length !== 2 || clampWidth(widthPct) === 100) return channels;
+    return applyStereoWidthInPlace(copyChannels(channels), widthPct);
+  }
+
+  // Trims leading/trailing near-silence and fades the cut edges.
+  //
+  // "Silence" is judged RELATIVE to the track's own peak (default: 60 dB
+  // below it, kept within -80..-50 dBFS), so a quietly exported mix loses
+  // no more than a loud one. v1.1 used a fixed -50 dBFS and cut straight
+  // at the last audible sample, which chopped seconds off reverb tails
+  // (ambient/piano endings) and faded the first 15 ms of an opening hit.
+  //
+  // Now a short pre-roll (default 20 ms) is kept before the first audible
+  // sample and a decay (default 400 ms) after the last one, and the fades
+  // run ONLY across that kept sub-threshold padding: the opening attack
+  // and the last audible note are never touched, and the file still
+  // starts and ends on exact zero (no click). An edge with less silence
+  // than its padding is left completely untouched, as is a track that is
+  // silent throughout.
+  var TRIM_BELOW_PEAK_DB = 60;
+  function trimSilenceAndFade(channels, sampleRate, opts) {
+    opts = opts || {};
+    var numChannels = channels.length;
+    var n = channels[0].length;
+    var untouched = { channels: channels, trimmedStartSamples: 0, trimmedEndSamples: 0, fadeInSamples: 0, fadeOutSamples: 0 };
+    if (n === 0) return untouched;
+
+    var thresholdDb;
+    if (opts.thresholdDb != null) {
+      thresholdDb = opts.thresholdDb;
+    } else {
+      var peak = samplePeak(channels);
+      if (!(peak > 0)) return untouched;
+      thresholdDb = linearToDb(peak) - TRIM_BELOW_PEAK_DB;
+      if (thresholdDb > -50) thresholdDb = -50;
+      if (thresholdDb < -80) thresholdDb = -80;
+    }
+    var thresholdLin = dbToLinear(thresholdDb);
+    var leadSamples = Math.round(0.001 * (opts.leadMs != null ? opts.leadMs : 20) * sampleRate);
+    var tailSamples = Math.round(0.001 * (opts.tailMs != null ? opts.tailMs : 400) * sampleRate);
+
+    function frameAbsMax(i) {
+      var m = 0;
+      for (var c = 0; c < numChannels; c++) {
+        var a = Math.abs(channels[c][i]);
+        if (a > m) m = a;
+      }
+      return m;
+    }
+
+    var start = 0;
+    while (start < n && frameAbsMax(start) < thresholdLin) start++;
+    if (start >= n) return untouched; // nothing above the threshold anywhere
+    var end = n - 1;
+    while (end > start && frameAbsMax(end) < thresholdLin) end--;
+
+    var newStart = start - leadSamples;
+    if (newStart < 0) newStart = 0;
+    var newEnd = end + tailSamples;
+    if (newEnd > n - 1) newEnd = n - 1;
+    var trimmedStart = newStart;
+    var trimmedEnd = (n - 1) - newEnd;
+    if (trimmedStart === 0 && trimmedEnd === 0) return untouched;
+
+    // slice() copies, so the fades below never touch the caller's buffers.
+    var trimmed = channels.map(function (chan) { return chan.slice(newStart, newEnd + 1); });
+    var newLen = trimmed[0].length;
+    var fadeIn = trimmedStart > 0 ? start - newStart : 0;  // == leadSamples
+    var fadeOut = trimmedEnd > 0 ? newEnd - end : 0;       // == tailSamples
+    trimmed.forEach(function (chan) {
+      var i;
+      for (i = 0; i < fadeIn; i++) chan[i] *= i / fadeIn;
+      for (i = 0; i < fadeOut; i++) chan[newLen - 1 - i] *= i / fadeOut;
+    });
+
+    return { channels: trimmed, trimmedStartSamples: trimmedStart, trimmedEndSamples: trimmedEnd, fadeInSamples: fadeIn, fadeOutSamples: fadeOut };
+  }
+
+  // Sums the low end (below crossoverHz) to mono while leaving everything
+  // above the crossover in stereo. Implemented via mid/side: only the SIDE
+  // signal is high-passed at the crossover, so below it L and R converge
+  // to identical (mono) while above it width is preserved. (A per-channel
+  // lowpass split leaked a lot of low end into the non-mono'd residual
+  // around the crossover: ~72% of a 60 Hz L/R difference remained, vs ~24%
+  // with the side-only high-pass.)
+  function applyBassMonoInPlace(channels, sampleRate, opts) {
+    opts = opts || {};
+    if (!opts.enabled) return channels;
+    if (channels.length !== 2) return channels; // nothing to "mono" on mono input
+    var crossoverHz = opts.crossoverHz != null ? opts.crossoverHz : 120;
+    var hpCoef = makeBiquad('highpass', crossoverHz, Math.SQRT1_2, 0, sampleRate);
+    var L = channels[0], R = channels[1];
+    var n = L.length;
+    var side = new Float32Array(n);
+    for (var i = 0; i < n; i++) side[i] = (L[i] - R[i]) * 0.5;
+    applyBiquadInPlace(side, hpCoef);
+    for (var j = 0; j < n; j++) {
+      var mid = (L[j] + R[j]) * 0.5;
+      L[j] = mid + side[j];
+      R[j] = mid - side[j];
+    }
+    return channels;
+  }
+  function applyBassMono(channels, sampleRate, opts) {
+    if (!opts || !opts.enabled || channels.length !== 2) return channels;
+    return applyBassMonoInPlace(copyChannels(channels), sampleRate, opts);
+  }
+
+  // Splits into low/mid/high bands via an exact complementary split
+  // (low = lowpass(x, lowHz), high = highpass(x, highHz), mid = x - low -
+  // high -- low + mid + high reconstructs the original exactly), compresses
+  // each band with its own glue-compressor settings, then sums the bands
+  // back together. Catches what a single full-band compressor can't: a
+  // loud kick pumping down the highs, or a cymbal wash dulling the bass.
+  function multibandCompress(channels, sampleRate, opts) {
+    opts = opts || {};
+    var lowHz = opts.lowHz != null ? opts.lowHz : 150;
+    var highHz = opts.highHz != null ? opts.highHz : 3000;
+    // Per-band defaults: bass gets a slower attack (fast gain changes on
+    // low frequencies distort the waveform of the cycle itself) and more
+    // release time; highs get a fast attack and quicker release so
+    // cymbals/hats don't visibly pump.
+    var lowOpts = opts.low || { thresholdDb: -22, ratio: 1.6, kneeDb: 6, attackMs: 30, releaseMs: 300 };
+    var midOpts = opts.mid || { thresholdDb: -24, ratio: 1.8, kneeDb: 6, attackMs: 15, releaseMs: 250 };
+    var highOpts = opts.high || { thresholdDb: -26, ratio: 1.8, kneeDb: 6, attackMs: 5, releaseMs: 150 };
+    function inPlace(o) { var r = {}; for (var key in o) r[key] = o[key]; r.inPlace = true; return r; }
+
+    var lpCoef = makeBiquad('lowpass', lowHz, Math.SQRT1_2, 0, sampleRate);
+    var hpCoef = makeBiquad('highpass', highHz, Math.SQRT1_2, 0, sampleRate);
+
+    var lowBand = channels.map(function (chan) { return applyBiquad(chan, lpCoef); });
+    var highBand = channels.map(function (chan) { return applyBiquad(chan, hpCoef); });
+    var midBand = channels.map(function (chan, c) {
+      var n = chan.length;
+      var out = new Float32Array(n);
+      var lb = lowBand[c], hb = highBand[c];
+      for (var i = 0; i < n; i++) out[i] = chan[i] - lb[i] - hb[i];
+      return out;
+    });
+
+    glueCompress(lowBand, sampleRate, inPlace(lowOpts));
+    glueCompress(midBand, sampleRate, inPlace(midOpts));
+    glueCompress(highBand, sampleRate, inPlace(highOpts));
+
+    var numChannels = channels.length;
+    var n2 = channels[0].length;
+    var out = opts.inPlace ? channels : [];
+    for (var c2 = 0; c2 < numChannels; c2++) {
+      var sum = opts.inPlace ? channels[c2] : new Float32Array(n2);
+      var lc = lowBand[c2], mc = midBand[c2], hc = highBand[c2];
+      for (var i2 = 0; i2 < n2; i2++) sum[i2] = lc[i2] + mc[i2] + hc[i2];
+      if (!opts.inPlace) out.push(sum);
+    }
+    return out;
+  }
+
+  // Gentle harmonic saturation ("warmth") via a tanh soft-clip blended
+  // with the dry signal. amount<=0 is an exact no-op. The tanh curve is
+  // normalized (divided by tanh(drive)) so a full-scale sample maps back
+  // to itself -- it adds harmonics/density without raising the level,
+  // leaving loudness matching and the limiter in control of the result.
+  function saturationParams(opts) {
+    opts = opts || {};
+    var amount = opts.amount != null ? opts.amount : 0;
+    if (!(amount > 0)) return null;
+    if (amount > 100) amount = 100;
+    var mix = amount / 100;
+    var drive = 1 + mix * 5; // 1 (gentle) .. 6 (noticeably driven)
+    return { mix: mix, drive: drive, driveTanh: Math.tanh(drive) };
+  }
+  function saturateInto(src, dst, p) {
+    for (var i = 0; i < src.length; i++) {
+      var x = src[i];
+      var wet = Math.tanh(p.drive * x) / p.driveTanh;
+      dst[i] = x + (wet - x) * p.mix;
+    }
+    return dst;
+  }
+  function applySaturationInPlace(channels, opts) {
+    var p = saturationParams(opts);
+    if (!p) return channels;
+    channels.forEach(function (chan) { saturateInto(chan, chan, p); });
+    return channels;
+  }
+  function applySaturation(channels, opts) {
+    var p = saturationParams(opts);
+    if (!p) return channels;
+    return channels.map(function (chan) { return saturateInto(chan, new Float32Array(chan.length), p); });
+  }
+
+  // Length (frames) of the run of digital silence (every channel below
+  // -80 dBFS: true zeros or dither noise) at the start or end of the audio,
+  // capped at 50 ms and at half the file.
+  var EDGE_SILENCE_LIN = Math.pow(10, -80 / 20);
+  function edgeSilenceRun(channels, fromEnd, sampleRate) {
+    var n = channels[0].length;
+    var cap = Math.min(Math.round(0.05 * sampleRate), Math.floor(n / 2));
+    var run = 0;
+    for (; run < cap; run++) {
+      var i = fromEnd ? n - 1 - run : run;
+      for (var c = 0; c < channels.length; c++) {
+        var v = channels[c][i];
+        if (v > EDGE_SILENCE_LIN || v < -EDGE_SILENCE_LIN) return run;
+      }
+    }
+    return run;
+  }
+  function applyEdgeFadesInPlace(channels, lead, tail) {
+    for (var c = 0; c < channels.length; c++) {
+      var chan = channels[c], n = chan.length, i;
+      for (i = 0; i < lead; i++) chan[i] *= i / lead;
+      for (i = 0; i < tail; i++) chan[n - 1 - i] *= i / tail;
+    }
+    return channels;
+  }
+
+  // ---------------------------------------------------------------------
+  // Full mastering chain
+  // ---------------------------------------------------------------------
+  function analyze(decoded, knownTruePeakLin) {
+    var lufs = integratedLoudness(decoded.channels, decoded.sampleRate);
+    var truePeakLin = knownTruePeakLin != null ? knownTruePeakLin : truePeak(decoded.channels);
+    var crest = crestFactorDb(decoded.channels);
+    return {
+      lufs: lufs,
+      truePeakDb: linearToDb(truePeakLin),
+      samplePeakDb: linearToDb(samplePeak(decoded.channels)),
+      crestFactorDb: crest,
+      durationSec: decoded.frameCount / decoded.sampleRate
+    };
+  }
+
+  function master(decoded, presetId, opts) {
+    opts = opts || {};
+    var sampleRate = decoded.sampleRate;
+    var inputAnalysis = analyze(decoded); // always measured on the untouched original upload
+    var preset = resolvePreset(presetId, inputAnalysis.crestFactorDb);
+    var isEffectivelySilent = !isFinite(inputAnalysis.lufs) || inputAnalysis.lufs < -60;
+
+    // 0) Optional: trim leading/trailing near-silence and fade the cut
+    // edges. Runs first so every later step (and the exported length)
+    // works on the trimmed material; inputAnalysis still reflects the
+    // original upload as-is.
+    var trimResult = opts.trimSilence
+      ? trimSilenceAndFade(decoded.channels, sampleRate)
+      : { channels: decoded.channels, trimmedStartSamples: 0, trimmedEndSamples: 0 };
+
+    // One working copy; every stage below runs in place on it. The copy is
+    // skipped when trimming already produced fresh buffers, or when the
+    // caller says the decoded audio may be consumed (opts.inPlace -- the
+    // browser worker does this; it has no further use for the original).
+    var work;
+    if (trimResult.channels !== decoded.channels || opts.inPlace) work = trimResult.channels;
+    else work = copyChannels(decoded.channels);
+
+    // Digital silence at the very start/end of the input (see step 4b).
+    // After trimming, the kept (already faded) padding is re-faded on the
+    // output too, so DC removal/filtering can't leave a step at the cut.
+    var edgeLead = Math.max(edgeSilenceRun(work, false, sampleRate), trimResult.fadeInSamples || 0);
+    var edgeTail = Math.max(edgeSilenceRun(work, true, sampleRate), trimResult.fadeOutSamples || 0);
+
+    // 1) DC offset removal (per-channel mean subtraction).
+    work.forEach(function (chan) {
+      var sum = 0;
+      for (var i = 0; i < chan.length; i++) sum += chan[i];
+      var mean = chan.length ? sum / chan.length : 0;
+      if (Math.abs(mean) < 1e-6) return; // nothing meaningful to remove
+      for (var j = 0; j < chan.length; j++) chan[j] -= mean;
+    });
+
+    // 2) Rumble high-pass at 20Hz -- removes inaudible sub content that
+    // eats headroom without adding perceived loudness.
+    var rumbleCoef = makeBiquad('highpass', 20.0, Math.SQRT1_2, 0.0, sampleRate);
+    work.forEach(function (chan) { applyBiquadInPlace(chan, rumbleCoef); });
+
+    // 2a) Reference-level pre-gain (see REFERENCE_LUFS): makes saturation
+    // and compression independent of the export level of the mix.
+    var preGainDb = 0;
+    if (!isEffectivelySilent) {
+      preGainDb = REFERENCE_LUFS - inputAnalysis.lufs;
+      if (preGainDb > 30) preGainDb = 30;
+      if (preGainDb < -30) preGainDb = -30;
+      scaleInPlace(work, dbToLinear(preGainDb));
+    }
+
+    // 2b) Optional tonal EQ (bass/mid/treble) -- before dynamics, so the
+    // compressor/limiter react to the tonally-shaped signal.
+    if (opts.eq) applyToneEQInPlace(work, sampleRate, opts.eq);
+
+    // 2c) Optional stereo width -- no-op for mono input or 100%.
+    if (opts.stereoWidthPct != null) applyStereoWidthInPlace(work, opts.stereoWidthPct);
+
+    // 2d) Optional bass-mono -- after width (so a user-chosen width is
+    // respected everywhere except the summed low end), before dynamics.
+    if (opts.bassMono) applyBassMonoInPlace(work, sampleRate, { enabled: true, crossoverHz: opts.bassMonoHz });
+
+    // 2e) Optional saturation/warmth.
+    if (opts.saturation && opts.saturation.amount > 0) applySaturationInPlace(work, opts.saturation);
+
+    // 3) Dynamics: gentle glue compression, single full-band (default) or
+    // multiband. Skipped entirely on near-silent input either way.
+    if (!isEffectivelySilent) {
+      if (opts.multiband) {
+        var mbOpts = typeof opts.multiband === 'object' ? opts.multiband : {};
+        var mb = {}; for (var key in mbOpts) mb[key] = mbOpts[key];
+        mb.inPlace = true;
+        multibandCompress(work, sampleRate, mb);
+      } else {
+        glueCompress(work, sampleRate, {
+          thresholdDb: -24, ratio: 1.8, kneeDb: 6, attackMs: 15, releaseMs: 250, inPlace: true
+        });
+      }
+    }
+
+    // 4) Loudness normalization THROUGH the true-peak limiter. Limiting
+    // lowers loudness, so the gain is re-solved (secant steps) until the
+    // limited result sits on the target, instead of normalizing first and
+    // shipping whatever the limiter leaves (v1.0 missed Club by up to 3 dB).
+    var ceilingPubLin = dbToLinear(preset.ceilingDbTP);
+    var ceilingLin = dbToLinear(preset.ceilingDbTP - LIMITER_MARGIN_DB);
+    var target = preset.targetLUFS;
+    var postCompLUFS = isEffectivelySilent ? -Infinity : integratedLoudness(work, sampleRate);
+    var baseGainDb = 0;
+    if (!isEffectivelySilent && isFinite(postCompLUFS)) {
+      baseGainDb = target - postCompLUFS;
+      // Sanity clamp: never apply an absurd gain.
+      if (baseGainDb > 40) baseGainDb = 40;
+      if (baseGainDb < -40) baseGainDb = -40;
+    }
+    var maxGainDb = Math.min(40, baseGainDb + MAX_LIMITER_PUSH_DB);
+    var minGainDb = baseGainDb - MAX_LIMITER_PUSH_DB;
+
+    var tpd = makeTruePeakDetector(work);
+    var out = work.map(function (c) { return new Float32Array(c.length); });
+    var gainDb = baseGainDb, prevGainDb = null, prevLufs = null, lim = null, outLufs = -Infinity;
+    for (var iter = 0; ; iter++) {
+      var gainLin = dbToLinear(gainDb);
+      tpd.ensure(ceilingLin / gainLin);
+      lim = limitTruePeak(work, tpd.det, gainLin, ceilingLin, sampleRate, out, { lookaheadMs: 5, releaseMs: 60 });
+      if (isEffectivelySilent) break;
+      outLufs = integratedLoudness(out, sampleRate);
+      if (!isFinite(outLufs)) break;
+      var err = target - outLufs;
+      if (Math.abs(err) <= LOUDNESS_TOLERANCE_DB || iter >= LOUDNESS_MAX_ITERATIONS - 1) break;
+      var next = gainDb + err;
+      if (prevGainDb !== null && gainDb !== prevGainDb) {
+        var slope = (outLufs - prevLufs) / (gainDb - prevGainDb);
+        if (slope > 0.05) next = gainDb + err / slope;
+      }
+      if (next > maxGainDb) next = maxGainDb;
+      if (next < minGainDb) next = minGainDb;
+      if (Math.abs(next - gainDb) < 0.005) break; // pinned at the push limit
+      prevGainDb = gainDb; prevLufs = outLufs; gainDb = next;
+    }
+    tpd = null; work = null;
+
+    // 4b) Keep silent file edges silent. The 20 Hz high-pass (like any
+    // causal filter) lets a track that stops abruptly ring on as a slowly
+    // decaying low-frequency tail, and DC removal shifts leading zeros by
+    // the mean -- so a file whose input ended/started in digital silence
+    // could end/start on a non-zero sample: a tick when playback starts or
+    // stops. Fading out exactly the samples that were silent in the input
+    // (<= 50 ms) removes that without touching a single audible sample.
+    applyEdgeFadesInPlace(out, edgeLead, edgeTail);
+
+    // 5) Final verification with the true-peak meter. The limiter already
+    // keeps a margin, so this is a last-resort guarantee: if anything
+    // still reads over the published ceiling, trim the whole file.
+    var tpOut = truePeak(out);
+    if (tpOut > ceilingPubLin) {
+      var trim = (ceilingPubLin / tpOut) * 0.9995;
+      scaleInPlace(out, trim);
+      tpOut *= trim;
+    }
+
+    var outputAnalysis = analyze({ channels: out, sampleRate: sampleRate, frameCount: out[0].length }, tpOut);
+
+    return {
+      channels: out,
+      sampleRate: sampleRate,
+      preset: preset,
+      input: inputAnalysis,
+      output: outputAnalysis,
+      appliedGainDb: preGainDb + gainDb,
+      limiterMaxReductionDb: lim ? lim.maxReductionDb : 0,
+      targetReached: isEffectivelySilent || (isFinite(outputAnalysis.lufs) && Math.abs(outputAnalysis.lufs - target) <= 0.5),
+      silent: isEffectivelySilent,
+      trimmedStartSamples: trimResult.trimmedStartSamples,
+      trimmedEndSamples: trimResult.trimmedEndSamples
+    };
+  }
+
+  return {
+    PRESETS: PRESETS,
+    parseWav: parseWav,
+    encodeWav: encodeWav,
+    analyze: analyze,
+    master: master,
+    // exported for testing:
+    _internal: {
+      makeBiquad: makeBiquad,
+      applyBiquad: applyBiquad,
+      integratedLoudness: integratedLoudness,
+      truePeak: truePeak,
+      truePeakDetector: truePeakDetector,
+      estimateTruePeakLinear: truePeak, // v1.0 name, kept for existing tests
+      samplePeak: samplePeak,
+      crestFactorDb: crestFactorDb,
+      glueCompress: glueCompress,
+      limit: limit,
+      limitTruePeak: limitTruePeak,
+      linearToDb: linearToDb,
+      dbToLinear: dbToLinear,
+      resolvePreset: resolvePreset,
+      applyToneEQ: applyToneEQ,
+      applyStereoWidth: applyStereoWidth,
+      trimSilenceAndFade: trimSilenceAndFade,
+      applyBassMono: applyBassMono,
+      multibandCompress: multibandCompress,
+      applySaturation: applySaturation
+    }
+  };
+});
+
+
+</script>
+
+<script>
+(function(){
+  'use strict';
+
+  // ---------------------------------------------------------------------
+  // i18n
+  // ---------------------------------------------------------------------
+  var I18N = {
+    cs: {
+      page_title: "DZMASTER — Automatický online mastering hudby | SYNTHLUCIDA",
+      page_desc: "Nahrajte WAV a DZMASTER během pár vteřin ve vašem prohlížeči udělá základní mastering — správná hlasitost a bezpečné špičky pro Spotify, YouTube i běžné přehrávače.",
+      brand_sub: "by SYNTHLUCIDA",
+      hero_h1: 'Mastering na jedno kliknutí — <span class="grad">přímo v prohlížeči</span>',
+      hero_p: "Nahrajte WAV, vyberte cílovou platformu a DZMASTER během pár vteřin doladí hlasitost a špičky, aby stopa hrála čistě a konzistentně na Spotify, YouTube i běžných přehrávačích.",
+      trust_1: "🔒 Soubor se nikam neodesílá", trust_2: "⚡ Zpracování v prohlížeči", trust_3: "🆓 Zdarma, bez registrace",
+      promo_tag: "Tip od SYNTHLUCIDA",
+      promo_title: "RELAXPLAYER — hudební přehrávač pro klid a soustředění",
+      promo_text: "Až budete mít track mastrovaný, pusťte si ho (nebo cokoliv jiného) v RELAXPLAYERu — dalším nástroji z rodiny SYNTHLUCIDA.",
+      promo_cta: "Vyzkoušet RELAXPLAYER →",
+      guide_summary: "📖 Jak připravit track a co od masteringu čekat (průvodce)",
+      guide_prep_title: "1. Jak připravit track před masteringem",
+      guide_prep_1: "Exportujte z DAW jako WAV ve stejném sample rate jako projekt (44,1 nebo 48 kHz), ideálně 24-bit — zbytečné převzorkování nebo export do MP3 před masteringem jen ztrácí informace, které pak nejdou vrátit.",
+      guide_prep_2: "Nechte na master bus rezervu (headroom): špičky mixu by měly sahat zhruba do −6 až −3 dBFS, ne narvané na 0 dB. Pokud máte na masteru limiter nebo maximizer, před exportem ho vypněte nebo hodně povolte — mastering potřebuje prostor, se kterým může pracovat.",
+      guide_prep_3: "Zkontrolujte a případně ořízněte ticho na začátku a konci — nebo to nechte na volbu „Oříznout ticho“ v Pokročilém nastavení.",
+      guide_prep_4: "Mastering doladí hlasitost a dynamiku, ale nespraví špatný mix. Konflikty mezi nástroji, přebušený bas, potichý vokál — tohle řešte zpátky v mixu, ne přes mastering.",
+      guide_honest_title: "2. Co mastering dokáže a co ne (bez příkras)",
+      guide_honest_can: "Dokáže: sjednotit hlasitost na správný cíl pro danou platformu, jemně vyrovnat dynamiku, ochránit stopu před ořezáním špiček při přehrávání i po kompresi do MP3/AAC, a přidat jemné tónové doladění nebo teplo.",
+      guide_honest_cannot: "Nedokáže: opravit rozladěný nástroj, špatně nahraný zpěv, nevyvážený mix, sykavky, dunění místnosti nebo šum z nahrávání. Tyhle věci patří do nahrávání a mixu — mastering je až poslední doladění navrch, ne záchranná brzda.",
+      guide_honest_note_label: "Upřímně:",
+      guide_honest_note: "mastering je tak z 5–10 % zvuku celé skladby. Většinu práce odvede dobrý mix. Pokud track nezní dobře před masteringem, nebude znít dobře ani po něm — jen hlasitěji.",
+      guide_preset_title: "3. Jak vybrat předvolbu",
+      guide_preset_1: "Smart Auto je rozumný výchozí bod, pokud si nejste jistí — cílovou hlasitost odvodí z crest factoru (poměru špička/RMS) vaší nahrávky, takže dynamický akustický track dostane jiné zacházení než hutný elektronický mix.",
+      guide_preset_2: "Nemá smysl honit co nejvyšší hlasitost za každou cenu. Spotify, YouTube i většina dalších služeb track stejně přenormalizují na svůj vlastní cíl — extra hlasitost navíc tak jen ubírá dynamiku a stopa zní unaveně, aniž by v přehrávači byla o cokoliv hlasitější.",
+      guide_mistakes_title: "4. Časté chyby",
+      guide_mistake_1: "Mastering ze souboru MP3/AAC místo WAV — komprimovaný formát informace nenávratně zahodil, mastering z něj je nemůže vrátit zpět.",
+      guide_mistake_2: "Opakovaný mastering „na vrstvu“ — mastrovat už jednou mastrovaný soubor znovu a znovu. Každý průchod přidá trochu zkreslení a ubere dynamiku.",
+      guide_mistake_3: "Přehnaně nahlas nabušený master bus ještě před masteringem — limiter nebo maximizer na finálním mixu nechá masteringu pracovat jen s tím, co mu zbylo.",
+      guide_mistake_4: "Slepě věřit číslům (LUFS, true peak) bez poslechu — jsou to užitečné nástroje, ne náhrada uší.",
+      guide_after_title: "5. Po masteringu",
+      guide_after_1: "Použijte přepínač Originál / Mastrováno a poslouchejte při stejné hlasitosti (loudness-matched) — hlasitější verze totiž skoro vždy zní „líp“, i když objektivně lepší není. DZMASTER hlasitost obou verzí v přehrávači sám nesrovnává, takže na to při poslechu pamatujte.",
+      guide_after_2: "Pokud track míří i tam, kde se hraje mono (starší rádia, některé kluby), zkontrolujte mono kompatibilitu — nebo rovnou zapněte „Basy do mono“ v Pokročilém nastavení.",
+      guide_after_3: "Než finální track schválíte, poslechněte si ho na víc než jednom zařízení — sluchátka, telefonní reproduktor, auto. Co zní skvěle na monitorech, nemusí sedět všude.",
+      step1_kicker: "Krok 1", step1_title: "Nahrajte WAV soubor",
+      drop_title: "Přetáhněte sem .wav soubor", drop_sub: "nebo klikněte pro výběr souboru · max. 600 MB",
+      clear_btn: "Odebrat",
+      privacy_note: "Celý mastering (analýza, EQ, kompresor, limiter) běží lokálně ve vašem prohlížeči pomocí JavaScriptu. Váš track nikdy neopustí vaše zařízení a neprochází žádným serverem.",
+      step2_kicker: "Krok 2", step2_title: "Vyberte předvolbu",
+      preset_smart_name: "🧠 Smart Auto", preset_smart_target: "auto",
+      preset_smart_desc: "Software sám podle analýzy skladby vybere nejvhodnější cílovou hlasitost. Doporučeno, pokud si nejste jistí.",
+      preset_streaming_name: "🎧 Streaming",
+      preset_streaming_desc: "Spotify, YouTube a většina streamovacích služeb normalizuje na −14 LUFS. Univerzální bezpečná volba.",
+      preset_apple_name: "🍎 Apple / Podcast",
+      preset_apple_desc: "Tišší, dynamičtější mastering pro Apple Music, mluvené slovo nebo akustické nahrávky.",
+      preset_club_name: "🔊 Club / EDM",
+      preset_club_desc: "Hlasitější, agresivnější limiting pro elektronickou hudbu a klubové sety.",
+      preset_broadcast_name: "📻 Broadcast (EBU R128)",
+      preset_broadcast_desc: "Standard EBU R128 je povinný pro TV a rozhlas v EU. Vhodné pro vysílání a AV produkci.",
+      preset_podcast_name: "🎙️ Podcast / Audiokniha (ACX)",
+      preset_podcast_desc: "V rozsahu doporučeném pro ACX audioknihy (−23 až −18 dB RMS) a běžné podcastové platformy.",
+      preset_bandcamp_name: "📀 Bandcamp / Přímé stažení",
+      preset_bandcamp_desc: "Bandcamp na rozdíl od Spotify hlasitost při přehrávání dál nesrovnává — co nastavíte, to lidé uslyší.",
+      preset_vinyl_name: "💿 Vinyl / Fyzické vydání",
+      preset_vinyl_desc: "Nižší hlasitost a víc prostoru pro špičky usnadní řezání desky a sníží riziko přeskakování jehly.",
+      preset_social_name: "📱 TikTok / Reels / Shorts",
+      preset_social_desc: "Blízko streamingu, ale o něco hlasitější pro krátká videa, která musí zaujmout hned na začátku.",
+      preset_classical_name: "🎻 Klasika / Akustika",
+      preset_classical_desc: "Nejtišší a nejdynamičtější volba ze všech — zachová co nejvíc rozdílu mezi tichými a hlasitými pasážemi.",
+      bitdepth_label: "Výstup:", bitdepth_16: "16-bit (univerzální)", bitdepth_24: "24-bit (archivní kvalita)",
+      adv_summary: "⚙️ Pokročilé nastavení (nepovinné)",
+      adv_eq_title: "Tónová korekce (EQ)",
+      adv_bass_label: "Basy · 120 Hz", adv_mid_label: "Středy · 1 kHz", adv_treble_label: "Výšky · 8 kHz",
+      adv_dynamics_title: "Dynamika",
+      adv_multiband_label: "Vícepásmová komprese (basy, středy a výšky zvlášť)",
+      adv_multiband_hint: "Jemnější výsledek na hutném mixu — hlasitý bas už \"nestahuje\" výšky dolů.",
+      adv_width_title: "Stereo šířka", adv_width_label: "Šířka",
+      adv_width_hint: "0 % = mono, 100 % = originál, 200 % = maximálně široké. Netýká se mono souborů.",
+      adv_bassmono_label: "Basy do mono pod 120 Hz",
+      adv_bassmono_hint: "Bezpečnější přehrávání na mono systémech i na vinylu, výšky zůstávají stereo.",
+      adv_saturation_title: "Sytost / teplo",
+      adv_saturation_label: "Sytost",
+      adv_saturation_hint: "0 % = beze změny, vyšší hodnoty přidají jemné harmonické zabarvení.",
+      adv_trim_label: "Oříznout ticho na začátku/konci (s jemným fade in/out)",
+      adv_reset_btn: "Obnovit výchozí hodnoty",
+      adv_trimmed_info: "Oříznuto ticho: ",
+      step3_kicker: "Krok 3", step3_title: "Zpracovat a stáhnout",
+      process_btn: "Zpracovat track",
+      status_idle: "Nejdřív nahrajte WAV soubor.",
+      status_ready: "Připraveno ke zpracování.",
+      status_processing: "Zpracovávám… delší skladba může trvat až minutu, hodinový DJ set i několik minut.",
+      status_done: "Hotovo! Track je vyladěný a připravený ke stažení.",
+      status_error: "Nastala chyba: ",
+      stat_lufs: "Hlasitost (LUFS)", stat_peak: "Špička (True Peak)", stat_gain: "Aplikovaný gain", stat_preset: "Předvolba",
+      wave_before: "Před", wave_after: "Po",
+      ab_label: "Poslech:", ab_before: "🔈 Originál", ab_after: "✨ Mastrováno",
+      download_btn: "Stáhnout mastrovaný WAV",
+      tech_summary: "Technické detaily zpracování",
+      how_kicker: "Jak to funguje", how_title: "Co DZMASTER dělá s vaší stopou",
+      how_q1: "1. Analýza", how_a1: "Nástroj změří integrovanou hlasitost (LUFS podle ITU‑R BS.1770), špičkovou úroveň a dynamiku skladby.",
+      how_q2: "2. Čištění a jemná komprese", how_a2: 'Odstraní se stejnosměrná složka a neslyšitelný rachot pod 20 Hz, poté jemný "glue" kompresor (ve výchozím nastavení jednopásmový) mírně vyrovná dynamiku.',
+      how_q3: "3. Vyrovnání hlasitosti", how_a3: "Track se zesílí nebo zeslabí na přesnou cílovou hlasitost zvolené předvolby.",
+      how_q4: "4. Bezpečný limiter", how_a4: "Look-ahead limiter zajistí, že špičky nikdy nepřekročí bezpečný strop zvolené předvolby (−1 dBTP u většiny předvoleb, −1.5 dBTP u Vinylu a −3 dBTP u Podcastu/Audioknihy) — nedojde tak k ořezání při přehrávání na streamovacích službách ani po kompresi do MP3/AAC.",
+      how_q5: "5. Export", how_a5: "Výsledek se rovnou v prohlížeči zabalí do WAV souboru ke stažení. Nic se nikam neposílá ani neukládá.",
+      how_q6: "6. Volitelné pokročilé funkce", how_a6: 'V Pokročilém nastavení si navíc můžete zapnout: 3pásmový EQ (basy/středy/výšky), stereo šířku, vícepásmovou kompresi (basy, středy a výšky se komprimují zvlášť, takže hlasitý bas "nestahuje" výšky dolů), basy do mono pod zvolenou frekvencí (bezpečnější přehrávání na mono systémech a vinylu), jemnou saturaci pro harmonické zabarvení a oříznutí ticha na začátku/konci s jemným fade. Všechny jsou ve výchozím stavu vypnuté nebo neutrální a na výsledek nemají žádný vliv, dokud je sami nezapnete. (Při exportu do 16-bit se navíc automaticky použije jemný dithering, který sníží slyšitelné zkreslení od zaokrouhlování.)',
+      footer_text: "DZMASTER je součástí rodiny nástrojů SYNTHLUCIDA.", footer_more: "O nástroji", footer_privacy: "Ochrana soukromí",
+      err_not_wav: "Tohle nevypadá jako WAV soubor (chybí RIFF/WAVE hlavička). Nahrajte prosím soubor ve formátu .wav.",
+      err_too_big: "Soubor je větší než 600 MB — to už je pro zpracování v prohlížeči příliš mnoho. Zkuste kratší úsek nebo nižší bit depth.",
+      err_read_fail: "Soubor se nepodařilo přečíst.",
+      err_unsupported_format: "Tenhle typ WAV souboru neumím zpracovat ({detail}). Podporované jsou PCM 8/16/24/32-bit a 32/64-bit float — zkuste soubor znovu vyexportovat z DAW jako 16- nebo 24-bit WAV.",
+      err_unsupported_rate: "Nepodporovaná vzorkovací frekvence ({detail}). Podporováno je 8 až 768 kHz.",
+      err_unsupported_channels: "Nepodporovaný počet kanálů ({detail}).",
+      err_no_audio: "Soubor neobsahuje žádná zvuková data (chybí nebo je prázdný datový blok WAV).",
+      err_silent: "Soubor je celý tichý nebo skoro tichý (pod −60 LUFS) — není co mastrovat.",
+      err_mobile_too_long: "Tahle stopa ({len}) je na zpracování v telefonu příliš dlouhá — prohlížeči by došla paměť a stránka by spadla. Na tomhle zařízení to zvládne zhruba do {max}. Zkuste to na počítači, nebo stopu zkraťte.",
+      err_mobile_too_long_extras: "S vícepásmovou kompresí nebo ořezem ticha je tahle stopa ({len}) na telefon příliš dlouhá (zvládne zhruba do {max}). Vypněte je v Pokročilém nastavení, nebo stopu zpracujte na počítači.",
+      err_memory: "Na tak dlouhou nahrávku nemá prohlížeč na tomto zařízení dost paměti. Zkuste kratší úsek, 16-bit soubor nebo počítač místo telefonu.",
+      note_target_missed: "Pozn.: cílových {target} LUFS nešlo bezpečně dosáhnout — track je hodně dynamický a další zesílení by ho už slyšitelně zkreslilo. Výsledek má {out} LUFS. Pro vyšší hlasitost zkuste v Pokročilém nastavení zapnout vícepásmovou kompresi.",
+      tech_rate: "Vzorkovací frekvence", tech_channels: "Kanály", tech_bits: "Výstup", tech_crest: "Crest factor (vstup)", tech_ceiling: "Strop", tech_limiter: "Max. zásah limiteru",
+      ch_mono: "mono", ch_stereo: "stereo", ch_multi: "kanálů",
+      preset_target_smart_resolved: "auto → "
+    },
+    en: {
+      page_title: "DZMASTER — Automatic Online Music Mastering | SYNTHLUCIDA",
+      page_desc: "Upload a WAV file and DZMASTER masters it right in your browser in seconds — correct loudness and safe peaks for Spotify, YouTube and everyday players.",
+      brand_sub: "by SYNTHLUCIDA",
+      hero_h1: 'One-click mastering — <span class="grad">right in your browser</span>',
+      hero_p: "Upload a WAV, pick a target platform, and DZMASTER tunes loudness and peaks in seconds so your track plays clean and consistent on Spotify, YouTube and everyday players.",
+      trust_1: "🔒 Your file never leaves your device", trust_2: "⚡ Processed in your browser", trust_3: "🆓 Free, no sign-up",
+      promo_tag: "A tip from SYNTHLUCIDA",
+      promo_title: "RELAXPLAYER — a music player for calm and focus",
+      promo_text: "Once your track is mastered, give it a spin (or play anything else) on RELAXPLAYER — another tool from the SYNTHLUCIDA family.",
+      promo_cta: "Try RELAXPLAYER →",
+      guide_summary: "📖 How to prepare a track and what mastering can (and can't) do — a guide",
+      guide_prep_title: "1. How to prepare a track before mastering",
+      guide_prep_1: "Export from your DAW as WAV at the same sample rate as your project (44.1 or 48 kHz), ideally 24-bit — unnecessary resampling or exporting to MP3 before mastering just throws away information you can't get back.",
+      guide_prep_2: "Leave headroom on the master bus: mix peaks should sit around −6 to −3 dBFS, not slammed up to 0 dB. If you have a limiter or maximizer on the master, turn it off (or back it off a lot) before exporting — mastering needs room to actually do something.",
+      guide_prep_3: "Check for, and trim, any silence at the start/end — or leave that to the \"Trim silence\" option in Advanced settings.",
+      guide_prep_4: "Mastering fine-tunes loudness and dynamics, but it won't fix a bad mix. Instrument clashes, an overpowering bass, a vocal sitting too quiet — sort those out back in the mix, not through mastering.",
+      guide_honest_title: "2. What mastering can and can't do (no sugarcoating)",
+      guide_honest_can: "Can do: bring the loudness to the right target for a given platform, gently even out dynamics, protect the track from clipping on playback and after MP3/AAC encoding, and add a touch of tonal polish or warmth.",
+      guide_honest_cannot: "Can't do: fix an out-of-tune instrument, a poorly recorded vocal, an unbalanced mix, harsh sibilance, room rumble, or recording noise. Those belong in recording and mixing — mastering is the last bit of polish on top, not a rescue.",
+      guide_honest_note_label: "Honestly:",
+      guide_honest_note: "mastering is maybe 5-10% of how a track ends up sounding. A good mix does most of the work. If a track doesn't sound good before mastering, it won't sound good after it either — just louder.",
+      guide_preset_title: "3. How to pick a preset",
+      guide_preset_1: "Smart Auto is a sensible default if you're not sure — it derives a target loudness from your track's crest factor (peak-to-RMS ratio), so a dynamic acoustic track gets treated differently from a dense electronic mix.",
+      guide_preset_2: "There's no point chasing the highest possible loudness for its own sake. Spotify, YouTube, and most other platforms renormalize your track to their own target anyway — extra loudness on top just eats into dynamics and makes the track sound tired, without it ending up any louder in the player.",
+      guide_mistakes_title: "4. Common mistakes",
+      guide_mistake_1: "Mastering from an MP3/AAC file instead of WAV — the compressed format has already thrown information away for good, and mastering can't bring it back.",
+      guide_mistake_2: "Mastering \"on top of\" mastering — running an already-mastered file through mastering again and again. Each pass adds a bit of distortion and eats into dynamics.",
+      guide_mistake_3: "A master bus already slammed loud before mastering — a limiter or maximizer left on the final mix only leaves mastering with whatever headroom is left over.",
+      guide_mistake_4: "Trusting the numbers (LUFS, true peak) blindly without listening — they're useful tools, not a substitute for your ears.",
+      guide_after_title: "5. After mastering",
+      guide_after_1: "Use the Original / Mastered toggle and listen at matched loudness — a louder version will almost always sound \"better\" even when it objectively isn't. DZMASTER doesn't loudness-match the two versions for you in the player, so keep that in mind while listening.",
+      guide_after_2: "If the track is also headed somewhere it'll play in mono (older radios, some clubs), check mono compatibility — or just turn on \"Mono bass\" in Advanced settings.",
+      guide_after_3: "Before you sign off on the final track, listen to it on more than one device — headphones, a phone speaker, a car. What sounds great on studio monitors doesn't always hold up everywhere.",
+      step1_kicker: "Step 1", step1_title: "Upload a WAV file",
+      drop_title: "Drop your .wav file here", drop_sub: "or click to choose a file · max 600 MB",
+      clear_btn: "Remove",
+      privacy_note: "The entire mastering chain (analysis, EQ, compressor, limiter) runs locally in your browser via JavaScript. Your track never leaves your device and never touches a server.",
+      step2_kicker: "Step 2", step2_title: "Choose a preset",
+      preset_smart_name: "🧠 Smart Auto", preset_smart_target: "auto",
+      preset_smart_desc: "The tool analyzes your track and picks the most fitting target loudness for you. Recommended if you're not sure.",
+      preset_streaming_name: "🎧 Streaming",
+      preset_streaming_desc: "Spotify, YouTube and most streaming services normalize to −14 LUFS. A universal, safe choice.",
+      preset_apple_name: "🍎 Apple / Podcast",
+      preset_apple_desc: "A quieter, more dynamic master for Apple Music, spoken word or acoustic recordings.",
+      preset_club_name: "🔊 Club / EDM",
+      preset_club_desc: "Louder, more aggressive limiting for electronic music and club sets.",
+      preset_broadcast_name: "📻 Broadcast (EBU R128)",
+      preset_broadcast_desc: "EU television and radio must meet the EBU R128 standard (−23 LUFS). Good for broadcast or AV production.",
+      preset_podcast_name: "🎙️ Podcast / Audiobook (ACX)",
+      preset_podcast_desc: "Falls inside the ACX audiobook submission range (−23 to −18 dB RMS) and works well for most podcast platforms.",
+      preset_bandcamp_name: "📀 Bandcamp / Direct Download",
+      preset_bandcamp_desc: "Unlike Spotify, Bandcamp doesn't renormalize playback — the loudness you set here is what listeners actually hear.",
+      preset_vinyl_name: "💿 Vinyl / Physical Release",
+      preset_vinyl_desc: "Lower loudness and extra peak headroom makes the cutting process easier and reduces the risk of the needle skipping.",
+      preset_social_name: "📱 TikTok / Reels / Shorts",
+      preset_social_desc: "Close to the streaming target, but a touch louder for short clips that need to grab attention immediately.",
+      preset_classical_name: "🎻 Classical / Acoustic",
+      preset_classical_desc: "The quietest, most dynamic option of the set — preserves as much of the gap between quiet and loud passages as possible.",
+      bitdepth_label: "Output:", bitdepth_16: "16-bit (universal)", bitdepth_24: "24-bit (archival quality)",
+      adv_summary: "⚙️ Advanced settings (optional)",
+      adv_eq_title: "Tonal EQ",
+      adv_bass_label: "Bass · 120 Hz", adv_mid_label: "Mid · 1 kHz", adv_treble_label: "Treble · 8 kHz",
+      adv_dynamics_title: "Dynamics",
+      adv_multiband_label: "Multiband compression (bass, mid and treble handled separately)",
+      adv_multiband_hint: "A gentler result on dense mixes — a loud bass hit no longer drags the highs down with it.",
+      adv_width_title: "Stereo width", adv_width_label: "Width",
+      adv_width_hint: "0% = mono, 100% = original, 200% = maximum width. Has no effect on mono files.",
+      adv_bassmono_label: "Mono bass below 120 Hz",
+      adv_bassmono_hint: "Safer playback on mono systems and vinyl, highs stay stereo.",
+      adv_saturation_title: "Saturation / warmth",
+      adv_saturation_label: "Saturation",
+      adv_saturation_hint: "0% = unchanged, higher values add gentle harmonic coloration.",
+      adv_trim_label: "Trim leading/trailing silence (with a gentle fade in/out)",
+      adv_reset_btn: "Reset to defaults",
+      adv_trimmed_info: "Silence trimmed: ",
+      step3_kicker: "Step 3", step3_title: "Process and download",
+      process_btn: "Process track",
+      status_idle: "Upload a WAV file to get started.",
+      status_ready: "Ready to process.",
+      status_processing: "Processing… a longer track can take up to a minute, an hour-long DJ set a few minutes.",
+      status_done: "Done! Your track is mastered and ready to download.",
+      status_error: "Something went wrong: ",
+      stat_lufs: "Loudness (LUFS)", stat_peak: "Peak (True Peak)", stat_gain: "Gain applied", stat_preset: "Preset",
+      wave_before: "Before", wave_after: "After",
+      ab_label: "Listen to:", ab_before: "🔈 Original", ab_after: "✨ Mastered",
+      download_btn: "Download mastered WAV",
+      tech_summary: "Technical processing details",
+      how_kicker: "How it works", how_title: "What DZMASTER does to your track",
+      how_q1: "1. Analysis", how_a1: "Measures integrated loudness (LUFS per ITU‑R BS.1770), peak level and dynamic range.",
+      how_q2: "2. Cleanup & gentle glue compression", how_a2: "Removes DC offset and inaudible sub-20Hz rumble, then a gentle glue compressor (single-band by default) slightly evens out dynamics.",
+      how_q3: "3. Loudness matching", how_a3: "The track is turned up or down to hit the exact target loudness of the chosen preset.",
+      how_q4: "4. Safe limiting", how_a4: "A look-ahead limiter guarantees peaks never exceed the chosen preset's safe ceiling (−1 dBTP for most presets, −1.5 dBTP for Vinyl, and −3 dBTP for Podcast/Audiobook) — preventing clipping during streaming playback or lossy (MP3/AAC) encoding.",
+      how_q5: "5. Export", how_a5: "The result is packaged into a downloadable WAV file right in your browser. Nothing is ever uploaded or stored.",
+      how_q6: "6. Optional advanced features", how_a6: "Advanced settings also let you turn on: 3-band EQ (bass/mid/treble), stereo width, multiband compression (bass, mid and treble compressed separately, so a loud bass hit no longer drags the highs down with it), mono bass below a chosen frequency (safer playback on mono systems and vinyl), gentle saturation for harmonic coloration, and trimming silence from the start/end with a gentle fade. All are off by default (or neutral) and have no effect on the result unless you turn them on. (16-bit exports also get gentle dithering automatically, reducing audible rounding distortion.)",
+      footer_text: "DZMASTER is part of the SYNTHLUCIDA tools family.", footer_more: "About this tool", footer_privacy: "Privacy Policy",
+      err_not_wav: "This doesn't look like a WAV file (no RIFF/WAVE header found). Please upload a .wav file.",
+      err_too_big: "This file is larger than 600 MB, which is too much to process in-browser. Try a shorter clip or lower bit depth.",
+      err_read_fail: "Couldn't read the file.",
+      err_unsupported_format: "This kind of WAV file isn't supported ({detail}). Supported: PCM 8/16/24/32-bit and 32/64-bit float — try re-exporting it from your DAW as a 16- or 24-bit WAV.",
+      err_unsupported_rate: "Unsupported sample rate ({detail}). 8 to 768 kHz is supported.",
+      err_unsupported_channels: "Unsupported channel count ({detail}).",
+      err_no_audio: "The file contains no audio data (the WAV data chunk is missing or empty).",
+      err_silent: "The file is silent or nearly silent (below −60 LUFS) — there's nothing to master.",
+      err_mobile_too_long: "This track ({len}) is too long to process on a phone — the browser would run out of memory and the page would crash. This device can handle roughly up to {max}. Please use a computer, or shorten the track.",
+      err_mobile_too_long_extras: "With multiband compression or silence trimming on, this track ({len}) is too long for a phone (roughly up to {max} fits). Turn them off in Advanced settings, or process the track on a computer.",
+      err_memory: "This browser doesn't have enough memory on this device for such a long recording. Try a shorter clip, a 16-bit file, or a computer instead of a phone.",
+      note_target_missed: "Note: the {target} LUFS target couldn't be reached safely — the track is very dynamic and pushing it further would audibly distort it. The result is {out} LUFS. For more loudness, try enabling multiband compression in Advanced settings.",
+      tech_rate: "Sample rate", tech_channels: "Channels", tech_bits: "Output", tech_crest: "Crest factor (input)", tech_ceiling: "Ceiling", tech_limiter: "Max limiter reduction",
+      ch_mono: "mono", ch_stereo: "stereo", ch_multi: "channels",
+      preset_target_smart_resolved: "auto → "
+    }
+  };
+
+  var currentLang = 'cs';
+
+  function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || key; }
+  function tf(key, params){
+    return t(key).replace(/\{(\w+)\}/g, function(m, k){ return params && params[k] != null ? params[k] : m; });
+  }
+
+  // ---------------------------------------------------------------------
+  // Status line: kept as state (key + params), not as rendered text, so a
+  // language switch re-renders whatever is currently shown -- including
+  // "done" and error messages -- instead of resetting it.
+  // ---------------------------------------------------------------------
+  var statusState = { key: 'status_idle', params: null, err: false, raw: '' };
+  var statusLine = document.getElementById('status-line');
+
+  function renderStatus(){
+    statusLine.classList.toggle('err', !!statusState.err);
+    var text = statusState.key ? tf(statusState.key, statusState.params) : '';
+    statusLine.textContent = statusState.err ? (t('status_error') + text + (statusState.raw || '')) : text;
+  }
+  function setStatus(key, params){
+    statusState = { key: key, params: params || null, err: false, raw: '' };
+    renderStatus();
+  }
+  function setError(key, params, raw){
+    statusState = { key: key || '', params: params || null, err: true, raw: raw || '' };
+    renderStatus();
+  }
+
+  function applyLanguage(lang){
+    currentLang = I18N[lang] ? lang : 'cs';
+    var dict = I18N[currentLang];
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] != null) el.innerHTML = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (dict[key] != null) el.setAttribute('placeholder', dict[key]);
+    });
+    var titleEl = document.querySelector('title[data-i18n]');
+    if (titleEl) document.title = dict.page_title;
+    var descMeta = document.querySelector('meta[name=description]');
+    if (descMeta) descMeta.setAttribute('content', dict.page_desc);
+    document.querySelectorAll('[data-i18n-attr]').forEach(function(el){
+      var key = el.getAttribute('data-i18n-attr');
+      if (dict[key] != null) el.setAttribute('content', dict[key]);
+    });
+    document.getElementById('lang-cs').classList.toggle('active', currentLang === 'cs');
+    document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+    var privacyLink = document.getElementById('footer-privacy');
+    if (privacyLink) {
+      privacyLink.href = currentLang === 'en'
+        ? 'https://synthlucida.com/dzmaster/dzmaster-privacy-en.html'
+        : 'https://synthlucida.com/dzmaster/dzmaster-privacy.html';
+    }
+    var moreLink = document.getElementById('footer-more');
+    if (moreLink) {
+      moreLink.href = currentLang === 'en'
+        ? 'https://synthlucida.com/dzmaster/dzmaster-landing-en.html'
+        : 'https://synthlucida.com/dzmaster/dzmaster-landing.html';
+    }
+    var homeLink = document.getElementById('home-link');
+    if (homeLink) {
+      homeLink.href = currentLang === 'en'
+        ? 'https://synthlucida.com/dzmaster/dzmaster-landing-en.html'
+        : 'https://synthlucida.com/dzmaster/dzmaster-landing.html';
+      var homeLabel = currentLang === 'en' ? 'Home' : 'Domů';
+      homeLink.title = homeLabel;
+      homeLink.setAttribute('aria-label', homeLabel);
+    }
+    // "Add to home screen" should install the app under the name/start URL
+    // of the language the visitor is actually using.
+    var manifestLink = document.querySelector('link[rel=manifest]');
+    if (manifestLink) {
+      manifestLink.setAttribute('href', currentLang === 'en' ? '/dzmaster/manifest-dzmaster-en.json' : '/dzmaster/manifest-dzmaster-cz.json');
+    }
+    var dz = document.getElementById('dropzone');
+    if (dz) dz.setAttribute('aria-label', currentLang === 'en' ? 'Upload a WAV file' : 'Nahrát WAV soubor');
+    try { localStorage.setItem('dzmaster_lang', currentLang); } catch(e){}
+    renderStatus();
+    if (typeof refreshFileMeta === 'function') refreshFileMeta();
+    if (typeof renderResults === 'function') renderResults();
+  }
+
+  document.getElementById('lang-cs').addEventListener('click', function(){ applyLanguage('cs'); });
+  document.getElementById('lang-en').addEventListener('click', function(){ applyLanguage('en'); });
+
+  function initLang(){
+    // NOTE: must run only after every DOM element referenced by
+    // applyLanguage() has been assigned -- called at the bottom of this
+    // IIFE, not here, on purpose.
+    var qs = new URLSearchParams(location.search);
+    var fromQuery = qs.get('lang');
+    // dzmaster-en.html declares data-page-lang="en": whoever opens the
+    // English URL (e.g. from an English search result) gets English.
+    var pageLang = document.documentElement.getAttribute('data-page-lang');
+    var stored = null;
+    try { stored = localStorage.getItem('dzmaster_lang'); } catch(e){}
+    var lang = fromQuery || pageLang || stored || (navigator.language && navigator.language.slice(0,2)) || 'cs';
+    applyLanguage(lang === 'en' ? 'en' : 'cs');
+  }
+
+  // ---------------------------------------------------------------------
+  // Worker setup (engine code lives once, as inert text, embedded above)
+  // ---------------------------------------------------------------------
+  var engineSrc = document.getElementById('dzmaster-engine-src').textContent;
+  var workerBody = engineSrc + '\n' + [
+    'function downsamplePeaks(channels, points) {',
+    '  var n = channels[0].length;',
+    '  var out = new Float32Array(points);',
+    '  var bucket = Math.max(1, Math.floor(n / points));',
+    '  for (var p = 0; p < points; p++) {',
+    '    var start = p * bucket;',
+    '    var end = Math.min(n, start + bucket);',
+    '    var peak = 0;',
+    '    for (var c = 0; c < channels.length; c++) {',
+    '      var chan = channels[c];',
+    '      for (var i = start; i < end; i++) {',
+    '        var a = Math.abs(chan[i]);',
+    '        if (a > peak) peak = a;',
+    '      }',
+    '    }',
+    '    out[p] = peak;',
+    '  }',
+    '  return out;',
+    '}',
+    'self.onmessage = function(e) {',
+    '  var msg = e.data;',
+    '  try {',
+    '    if (msg.type === "process") {',
+    '      var decoded = DZMasterEngine.parseWav(msg.arrayBuffer);',
+    // The raw file bytes are no longer needed once decoded -- drop them so
+    // long recordings don't hold the file in memory twice.
+    '      msg.arrayBuffer = null;',
+    '      if (!decoded.frameCount) { var ne = new Error("No audio data"); ne.code = "NO_AUDIO"; throw ne; }',
+    '      var peaksBefore = downsamplePeaks(decoded.channels, 600);',
+    '      var opts = msg.advanced || {};',
+    // The worker has no further use for the decoded original, so the
+    // engine may process it in place (no extra full-length copy).
+    '      opts.inPlace = true;',
+    '      var result = DZMasterEngine.master(decoded, msg.presetId, opts);',
+    '      decoded = null;',
+    '      var peaksAfter = downsamplePeaks(result.channels, 600);',
+    '      var bits = msg.bitDepth === 24 ? 24 : 16;',
+    // TPDF dither only when reducing to 16-bit (the common case).
+    '      var encodeOpts = bits === 16 ? { dither: true } : undefined;',
+    '      var wavBuffer = DZMasterEngine.encodeWav(result.channels, result.sampleRate, bits, encodeOpts);',
+    '      self.postMessage({',
+    '        type: "done", jobId: msg.jobId, wavBuffer: wavBuffer,',
+    '        input: result.input, output: result.output, preset: result.preset,',
+    '        appliedGainDb: result.appliedGainDb, sampleRate: result.sampleRate,',
+    '        numChannels: result.channels.length, bitDepth: bits,',
+    '        limiterMaxReductionDb: result.limiterMaxReductionDb,',
+    '        targetReached: result.targetReached, silent: result.silent,',
+    '        trimmedStartSamples: result.trimmedStartSamples, trimmedEndSamples: result.trimmedEndSamples,',
+    '        peaksBefore: peaksBefore, peaksAfter: peaksAfter',
+    '      }, [wavBuffer, peaksBefore.buffer, peaksAfter.buffer]);',
+    '    }',
+    '  } catch (err) {',
+    '    var code = err && err.code ? err.code : ((err instanceof RangeError || /alloc|memory/i.test(String(err && err.message))) ? "OOM" : "");',
+    '    self.postMessage({ type: "error", jobId: msg && msg.jobId, code: code, message: (err && err.message) ? err.message : String(err) });',
+    '  }',
+    '};'
+  ].join('\n');
+
+  var workerUrl = URL.createObjectURL(new Blob([workerBody], { type: 'application/javascript' }));
+
+  // ---------------------------------------------------------------------
+  // UI state
+  // ---------------------------------------------------------------------
+  var selectedFile = null;
+  var selectedFileInfo = null; // header facts from inspectWav() (bits, rate, channels, duration)
+  var selectedPreset = 'smart';
+  var MAX_BYTES = 600 * 1024 * 1024;
+
+  // ---------------------------------------------------------------------
+  // Memory guard for phones/tablets. A desktop browser handles the full
+  // 600 MB (measured: a 55-min stereo file peaks at ~3.7 GB), but a mobile
+  // browser simply kills the tab when it runs out -- no error the page
+  // could catch. So on mobile the working memory a file will need is
+  // estimated from its WAV header and a file over the device's budget is
+  // refused up front, with the longest length that fits.
+  // ---------------------------------------------------------------------
+  var UA = navigator.userAgent || '';
+  var IS_APPLE_MOBILE = /iPhone|iPad|iPod/.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1); // iPadOS reports as Mac
+  var IS_MOBILE = IS_APPLE_MOBILE || /Android|Mobile|Silk|Kindle/i.test(UA);
+  var GB = 1024 * 1024 * 1024;
+
+  function mobileMemoryBudget(){
+    if (!IS_MOBILE) return Infinity;
+    if (IS_APPLE_MOBILE) return 0.9 * GB; // every iOS browser is WebKit: no deviceMemory
+    var dm = navigator.deviceMemory; // GB, Chromium only (Android)
+    if (typeof dm === 'number' && dm > 0) return dm <= 2 ? 0.45 * GB : dm <= 4 ? 0.75 * GB : 1.2 * GB;
+    return 0.75 * GB;
+  }
+
+  // Peak bytes the processing worker holds, per the engine's actual
+  // buffers: decoded float audio (processed in place) + limiter output +
+  // per-frame true-peak detector, then the encoded WAV; multiband adds
+  // three band copies, trimming one trimmed copy. The raw file bytes only
+  // coexist with the decoded audio while parsing.
+  function estimatePeakBytes(info, bitDepth, advanced){
+    var f = info && info.fmt;
+    if (!f || !info.durationSec) return 0;
+    var frames = info.durationSec * f.sampleRate, ch = f.numChannels;
+    var floatCh = frames * ch * 4;
+    var processing = floatCh * 2 + frames * 4;
+    if (advanced && advanced.multiband) processing += floatCh * 3;
+    if (advanced && advanced.trimSilence) processing += floatCh;
+    var parsing = floatCh + frames * ch * (f.bitsPerSample / 8);
+    var encoding = floatCh + frames * ch * (bitDepth / 8);
+    return Math.max(processing, parsing, encoding) * 1.1; // + engine/runtime slack
+  }
+
+  // Returns null when fine, or { key, params } for setError().
+  function memoryCheckError(info, bitDepth, advanced){
+    var budget = mobileMemoryBudget();
+    if (!isFinite(budget) || !info || !info.durationSec) return null;
+    var need = estimatePeakBytes(info, bitDepth, advanced);
+    if (need <= budget) return null;
+    var maxSec = info.durationSec * budget / need;
+    var params = { len: fmtDuration(info.durationSec), max: fmtDuration(Math.floor(maxSec / 10) * 10) };
+    var extras = advanced && (advanced.multiband || advanced.trimSilence);
+    if (extras && estimatePeakBytes(info, bitDepth, { multiband: false, trimSilence: false }) <= budget) {
+      return { key: 'err_mobile_too_long_extras', params: params };
+    }
+    return { key: 'err_mobile_too_long', params: params };
+  }
+
+  // Every processing run gets an id; any late answer (worker)
+  // for an older id is ignored, so replacing/removing the file or starting
+  // over can never mix one file's result with another's.
+  var jobCounter = 0;
+  var activeJobId = 0;
+  var busy = false;
+  var activeWorker = null;
+
+  var dropzone = document.getElementById('dropzone');
+  var fileInput = document.getElementById('file-input');
+  var fileInfo = document.getElementById('file-info');
+  var fileName = document.getElementById('file-name');
+  var fileMeta = document.getElementById('file-meta');
+  var fileClear = document.getElementById('file-clear');
+  var processBtn = document.getElementById('process-btn');
+  var progress = document.getElementById('progress');
+  var results = document.getElementById('results');
+  var resultNote = document.getElementById('result-note');
+  var abBeforeBtn = document.getElementById('ab-before');
+  var abAfterBtn = document.getElementById('ab-after');
+  var previewAudio = document.getElementById('preview-audio');
+
+  // ---------------------------------------------------------------------
+  // Advanced (optional) mastering controls -- all default to neutral/no-op
+  // values, so a user who never opens this section gets exactly the same
+  // result as before these existed.
+  // ---------------------------------------------------------------------
+  var advBass = document.getElementById('adv-bass');
+  var advMid = document.getElementById('adv-mid');
+  var advTreble = document.getElementById('adv-treble');
+  var advWidth = document.getElementById('adv-width');
+  var advTrim = document.getElementById('adv-trim');
+  var advMultiband = document.getElementById('adv-multiband');
+  var advBassMono = document.getElementById('adv-bassmono');
+  var advSaturation = document.getElementById('adv-saturation');
+  var advReset = document.getElementById('adv-reset');
+  var advBassValue = document.getElementById('adv-bass-value');
+  var advMidValue = document.getElementById('adv-mid-value');
+  var advTrebleValue = document.getElementById('adv-treble-value');
+  var advWidthValue = document.getElementById('adv-width-value');
+  var advSaturationValue = document.getElementById('adv-saturation-value');
+
+  var ADV_DEFAULTS = { bass: 0, mid: 0, treble: 0, width: 100, trim: false, multiband: false, bassMono: false, saturation: 0 };
+
+  function fmtDbSigned(v){ var n = Number(v); return (n > 0 ? '+' : '') + n.toFixed(1).replace(/\.0$/, '') + ' dB'; }
+
+  function refreshAdvancedLabels(){
+    advBassValue.textContent = fmtDbSigned(advBass.value);
+    advMidValue.textContent = fmtDbSigned(advMid.value);
+    advTrebleValue.textContent = fmtDbSigned(advTreble.value);
+    advWidthValue.textContent = advWidth.value + '%';
+    advSaturationValue.textContent = advSaturation.value + '%';
+  }
+  [advBass, advMid, advTreble, advWidth, advSaturation].forEach(function(el){
+    el.addEventListener('input', refreshAdvancedLabels);
+  });
+  refreshAdvancedLabels();
+
+  advReset.addEventListener('click', function(){
+    advBass.value = ADV_DEFAULTS.bass;
+    advMid.value = ADV_DEFAULTS.mid;
+    advTreble.value = ADV_DEFAULTS.treble;
+    advWidth.value = ADV_DEFAULTS.width;
+    advTrim.checked = ADV_DEFAULTS.trim;
+    advMultiband.checked = ADV_DEFAULTS.multiband;
+    advBassMono.checked = ADV_DEFAULTS.bassMono;
+    advSaturation.value = ADV_DEFAULTS.saturation;
+    refreshAdvancedLabels();
+  });
+
+  // Shape matches DZMasterEngine.master()'s opts exactly, so it can be
+  // passed straight through the worker with no translation step.
+  function getAdvancedOpts(){
+    return {
+      trimSilence: !!advTrim.checked,
+      eq: {
+        bassDb: parseFloat(advBass.value) || 0,
+        midDb: parseFloat(advMid.value) || 0,
+        trebleDb: parseFloat(advTreble.value) || 0
+      },
+      stereoWidthPct: parseFloat(advWidth.value),
+      multiband: !!advMultiband.checked,
+      bassMono: !!advBassMono.checked,
+      saturation: { amount: parseFloat(advSaturation.value) || 0 }
+    };
+  }
+
+  function fmtBytes(b){
+    if (b > 1024*1024) return (b/1024/1024).toFixed(1) + ' MB';
+    return (b/1024).toFixed(0) + ' KB';
+  }
+  function fmtDuration(sec){
+    if (!isFinite(sec) || sec < 0) return '';
+    sec = Math.round(sec);
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return (h ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+  function fmtChannels(n){
+    if (n === 1) return t('ch_mono');
+    if (n === 2) return t('ch_stereo');
+    return n + ' ' + t('ch_multi');
+  }
+
+  function refreshFileMeta(){
+    if (!selectedFile) return;
+    var parts = [];
+    var info = selectedFileInfo;
+    if (info && info.fmt) {
+      parts.push((info.fmt.formatCode === 3 ? info.fmt.bitsPerSample + '-bit float' : info.fmt.bitsPerSample + '-bit'));
+      parts.push((info.fmt.sampleRate / 1000).toFixed(info.fmt.sampleRate % 1000 ? 1 : 0) + ' kHz');
+      parts.push(fmtChannels(info.fmt.numChannels));
+      if (info.durationSec) parts.push(fmtDuration(info.durationSec));
+    }
+    parts.push(fmtBytes(selectedFile.size));
+    fileMeta.textContent = parts.join(' · ');
+  }
+
+  function checkWavMagicBytes(buf){
+    if (buf.byteLength < 12) return false;
+    var view = new DataView(buf);
+    var riff = String.fromCharCode(view.getUint8(0),view.getUint8(1),view.getUint8(2),view.getUint8(3));
+    var wave = String.fromCharCode(view.getUint8(8),view.getUint8(9),view.getUint8(10),view.getUint8(11));
+    return (riff === 'RIFF' || riff === 'RF64' || riff === 'BW64') && wave === 'WAVE';
+  }
+  // Same list as the engine's KNOWN_CHUNK_IDS (pad-byte recovery).
+  var KNOWN_CHUNK_IDS = ['fmt ','data','LIST','JUNK','junk','bext','fact','cue ','smpl','inst','id3 ','ID3 ','iXML','PAD ','FLLR','acid',
+    'strc','umid','minf','elm1','regn','ds64','_PMX','DISP','PEAK','levl','axml','chna','cart','plst','labl','afsp','SyLp','ResU','akai','MEXT','ovwf','ptrc','dbmd'];
+
+  // ---------------------------------------------------------------------
+  // Up-front WAV header check (a few tiny reads straight from the File --
+  // never loads the audio). Mirrors the engine's parser rules, so a file
+  // the engine can't decode is rejected right when it's picked, with a
+  // clear message, instead of after "Process" -- where, for a free user,
+  // it would already have used up the monthly free mastering.
+  // Rejects only on definite problems; anything unusual is left to the
+  // engine itself.
+  // ---------------------------------------------------------------------
+  function wavCheckError(code, detail){ var e = new Error(code); e.code = code; e.detail = detail; return e; }
+
+  function inspectWav(file){
+    function read(start, len){ return file.slice(start, Math.min(file.size, start + len)).arrayBuffer(); }
+    function id4(v, o){ return String.fromCharCode(v.getUint8(o), v.getUint8(o+1), v.getUint8(o+2), v.getUint8(o+3)); }
+    function printable(v, o){
+      if (o + 4 > v.byteLength) return false;
+      for (var i = 0; i < 4; i++) { var b = v.getUint8(o + i); if (b < 0x20 || b > 0x7e) return false; }
+      return true;
+    }
+    return read(0, 12).then(function(head){
+      if (!checkWavMagicBytes(head)) throw wavCheckError('NOT_WAV');
+      var fmt = null, dataStart = -1, dataSize = 0, offset = 12, guard = 0, ds64DataSize = -1;
+      function known(v, o){ return printable(v, o) && KNOWN_CHUNK_IDS.indexOf(id4(v, o)) !== -1; }
+      function finish(){
+        if (!fmt || dataStart < 0) {
+          if (guard > 400) return { fmt: fmt, durationSec: 0 }; // exotic layout: let the engine decide
+          throw wavCheckError(!fmt ? 'NO_FMT' : 'NO_DATA');
+        }
+        var bits = fmt.bitsPerSample;
+        var okFmt = (fmt.formatCode === 1 && (bits === 8 || bits === 16 || bits === 24 || bits === 32)) ||
+                    (fmt.formatCode === 3 && (bits === 32 || bits === 64));
+        if (!okFmt) throw wavCheckError('UNSUPPORTED_FORMAT', bits + '-bit, format ' + fmt.formatCode);
+        if (fmt.numChannels < 1 || fmt.numChannels > 32) throw wavCheckError('UNSUPPORTED_CHANNELS', String(fmt.numChannels));
+        if (!(fmt.sampleRate >= 8000 && fmt.sampleRate <= 768000)) throw wavCheckError('UNSUPPORTED_RATE', fmt.sampleRate + ' Hz');
+        var frameBytes = (bits / 8) * fmt.numChannels;
+        if (dataSize < frameBytes) throw wavCheckError('NO_AUDIO');
+        return { fmt: fmt, durationSec: (dataSize / frameBytes) / fmt.sampleRate };
+      }
+      function step(){
+        if (offset + 8 > file.size || guard++ > 400) return finish();
+        return read(offset, 9 + 8).then(function(hb){
+          var v = new DataView(hb);
+          var id = id4(v, 0);
+          var size = v.getUint32(4, true);
+          var chunkStart = offset + 8;
+          var next = chunkStart + size + (size % 2);
+          function advance(){
+            if (size % 2) {
+              // tolerate a missing pad byte after an odd-sized chunk
+              return read(next - 1, 5).then(function(pb){
+                var pv = new DataView(pb);
+                // byte 0 = where the chunk would start without the pad byte,
+                // byte 1 = with it (mirrors the engine's shouldDropPadByte)
+                if (!known(pv, 1) && (known(pv, 0) || (!printable(pv, 1) && printable(pv, 0)))) next -= 1;
+                offset = next;
+                return step();
+              });
+            }
+            offset = next;
+            return step();
+          }
+          if (id === 'fmt ') {
+            if (size < 16) throw wavCheckError('UNSUPPORTED_FORMAT', 'fmt ' + size + ' B');
+            return read(chunkStart, Math.min(size, 40)).then(function(fb){
+              var fv = new DataView(fb);
+              fmt = {
+                audioFormat: fv.getUint16(0, true),
+                numChannels: fv.getUint16(2, true),
+                sampleRate: fv.getUint32(4, true),
+                bitsPerSample: fv.getUint16(14, true)
+              };
+              fmt.formatCode = fmt.audioFormat;
+              if (fmt.audioFormat === 0xFFFE) fmt.formatCode = (size >= 26 && fb.byteLength >= 26) ? fv.getUint16(24, true) : 1;
+              if (dataStart >= 0) return finish();
+              return advance();
+            });
+          }
+          if (id === 'ds64' && size >= 16) {
+            return read(chunkStart, 16).then(function(db){
+              if (db.byteLength >= 16) { var dv = new DataView(db); ds64DataSize = dv.getUint32(8, true) + dv.getUint32(12, true) * 4294967296; }
+              return advance();
+            });
+          }
+          if (id === 'data') {
+            dataStart = chunkStart;
+            var remaining = file.size - chunkStart;
+            if (size === 0xFFFFFFFF && ds64DataSize >= 0) size = ds64DataSize;
+            dataSize = (size === 0 || size === 0xFFFFFFFF || size > remaining) ? remaining : size;
+            if (fmt) return finish();
+          }
+          return advance();
+        });
+      }
+      return step();
+    });
+  }
+
+  function errorKeyForCode(code){
+    return {
+      NOT_WAV: 'err_not_wav', NO_FMT: 'err_not_wav', BAD_FMT: 'err_not_wav',
+      NO_DATA: 'err_no_audio', NO_AUDIO: 'err_no_audio',
+      UNSUPPORTED_FORMAT: 'err_unsupported_format', UNSUPPORTED_RATE: 'err_unsupported_rate',
+      UNSUPPORTED_CHANNELS: 'err_unsupported_channels', OOM: 'err_memory'
+    }[code] || null;
+  }
+
+  // ---------------------------------------------------------------------
+  // Busy state / cancellation
+  // ---------------------------------------------------------------------
+  function updateProcessButton(){
+    processBtn.disabled = !selectedFile || busy;
+  }
+
+  function stopPreview(){
+    try { previewAudio.pause(); } catch(e){}
+  }
+
+  function hideResults(){
+    stopPreview();
+    results.classList.remove('show');
+  }
+
+  function setBusy(on){
+    busy = on;
+    progress.classList.toggle('show', on);
+    updateProcessButton();
+  }
+
+  // Abandons whatever run is in flight (worker).
+  function cancelActiveJob(){
+    activeJobId = 0;
+    if (activeWorker) { try { activeWorker.terminate(); } catch(e){} activeWorker = null; }
+    setBusy(false);
+  }
+
+  function acceptFile(file, info){
+    cancelActiveJob();
+    selectedFile = file;
+    selectedFileInfo = info;
+    fileName.textContent = file.name;
+    refreshFileMeta();
+    fileInfo.style.display = 'flex';
+    dropzone.style.display = 'none';
+    lastResult = null;
+    hideResults();
+    updateProcessButton();
+    setStatus('status_ready');
+  }
+
+  function handleFile(file){
+    if (!file) return;
+    if (file.size > MAX_BYTES) { setError('err_too_big'); return; }
+    inspectWav(file).then(function(info){
+      // Smallest possible footprint here (16-bit out, no extras); the
+      // process button re-checks with the options actually chosen.
+      var memErr = memoryCheckError(info, 16, null);
+      if (memErr) { setError(memErr.key, memErr.params); return; }
+      acceptFile(file, info);
+    }).catch(function(err){
+      var key = err && err.code ? errorKeyForCode(err.code) : null;
+      if (key) setError(key, { detail: err.detail || '' });
+      else setError('err_read_fail');
+    });
+  }
+
+  dropzone.addEventListener('click', function(){ fileInput.click(); });
+  dropzone.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+  fileInput.addEventListener('change', function(e){
+    handleFile(e.target.files[0]);
+    fileInput.value = ''; // picking the same file again must fire "change" again
+  });
+
+  ['dragenter','dragover'].forEach(function(evt){
+    dropzone.addEventListener(evt, function(e){ e.preventDefault(); e.stopPropagation(); dropzone.classList.add('drag'); });
+  });
+  ['dragleave','drop'].forEach(function(evt){
+    dropzone.addEventListener(evt, function(e){ e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('drag'); });
+  });
+  dropzone.addEventListener('drop', function(e){
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    handleFile(f);
+  });
+  // A file dropped anywhere else on the page must not make the browser
+  // navigate away to it (losing the page); treat it as an upload instead
+  // -- unless a track is being processed right now.
+  window.addEventListener('dragover', function(e){ e.preventDefault(); });
+  window.addEventListener('drop', function(e){
+    e.preventDefault();
+    if (busy) return;
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+
+  fileClear.addEventListener('click', function(){
+    cancelActiveJob();
+    selectedFile = null;
+    selectedFileInfo = null;
+    lastResult = null;
+    fileInput.value = '';
+    fileInfo.style.display = 'none';
+    dropzone.style.display = 'block';
+    hideResults();
+    updateProcessButton();
+    setStatus('status_idle');
+  });
+
+  var presetButtons = Array.prototype.slice.call(document.querySelectorAll('.preset'));
+  function markSelectedPreset(){
+    presetButtons.forEach(function(b){
+      var sel = b.getAttribute('data-preset') === selectedPreset;
+      b.classList.toggle('selected', sel);
+      b.setAttribute('aria-pressed', sel ? 'true' : 'false');
+    });
+  }
+  presetButtons.forEach(function(btn){
+    btn.setAttribute('type', 'button');
+    btn.addEventListener('click', function(){
+      selectedPreset = btn.getAttribute('data-preset');
+      markSelectedPreset();
+    });
+  });
+  markSelectedPreset(); // Smart Auto selected by default
+
+  function getBitDepth(){
+    var el = document.querySelector('input[name=bitdepth]:checked');
+    return el ? parseInt(el.value, 10) : 16;
+  }
+
+  // ---------------------------------------------------------------------
+  // Results rendering
+  // ---------------------------------------------------------------------
+  function drawWave(canvas, peaks){
+    var ctx = canvas.getContext('2d');
+    var w = canvas.clientWidth || 300;
+    var h = 64;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    var mid = h/2;
+    var n = peaks.length;
+    var grad = ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,'#7c6cff'); grad.addColorStop(1,'#34e0d6');
+    ctx.fillStyle = grad;
+    for (var i=0;i<n;i++){
+      var x = (i/n) * w;
+      var barH = Math.max(1, Math.min(1, peaks[i]) * (h*0.92));
+      ctx.fillRect(x, mid - barH/2, Math.max(1, w/n - 0.5), barH);
+    }
+  }
+
+  function fmtLUFS(v){ return isFinite(v) ? (v.toFixed(1) + ' LUFS') : '−∞ LUFS'; }
+  function fmtDb(v){ return isFinite(v) ? (v.toFixed(1) + ' dBTP') : '−∞ dBTP'; }
+  function presetDisplayName(id){
+    return t('preset_' + id + '_name').replace(/^[^A-Za-z0-9À-ɏ]+/, '');
+  }
+
+  var lastResult = null;       // data of the result currently on screen
+  var currentObjectUrl = null; // mastered ("after") result blob URL
+  var beforeObjectUrl = null;  // original uploaded file, as a playable blob URL
+
+  function drawWaves(){
+    if (!lastResult || !results.classList.contains('show')) return;
+    drawWave(document.getElementById('wave-before'), lastResult.peaksBefore);
+    drawWave(document.getElementById('wave-after'), lastResult.peaksAfter);
+  }
+
+  // Everything language-dependent in the results panel is rendered from
+  // lastResult, so switching CZ/EN afterwards re-translates it too.
+  function renderResults(){
+    var r = lastResult;
+    if (!r) return;
+    document.getElementById('stat-lufs-before').textContent = fmtLUFS(r.input.lufs);
+    document.getElementById('stat-lufs-after').textContent = fmtLUFS(r.output.lufs);
+    document.getElementById('stat-peak-before').textContent = fmtDb(r.input.truePeakDb);
+    document.getElementById('stat-peak-after').textContent = fmtDb(r.output.truePeakDb);
+    document.getElementById('stat-gain').textContent = (r.appliedGainDb >= 0 ? '+' : '') + r.appliedGainDb.toFixed(1) + ' dB';
+    document.getElementById('stat-preset').textContent = presetDisplayName(r.preset.id) +
+      (r.preset.id === 'smart' ? ' (' + r.preset.targetLUFS + ' LUFS)' : '');
+    document.getElementById('stat-lufs-after').classList.toggle('good', !!r.targetReached);
+
+    if (resultNote) {
+      if (!r.targetReached && isFinite(r.output.lufs)) {
+        resultNote.textContent = tf('note_target_missed', { target: r.preset.targetLUFS, out: r.output.lufs.toFixed(1) });
+        resultNote.hidden = false;
+      } else {
+        resultNote.hidden = true;
+      }
+    }
+
+    var techParts = [
+      t('tech_rate') + ': ' + r.sampleRate + ' Hz',
+      t('tech_channels') + ': ' + r.numChannels,
+      t('tech_bits') + ': ' + r.bitDepth + '-bit',
+      t('tech_crest') + ': ' + r.input.crestFactorDb.toFixed(1) + ' dB',
+      t('tech_ceiling') + ': ' + r.preset.ceilingDbTP + ' dBTP',
+      t('tech_limiter') + ': ' + (r.limiterMaxReductionDb || 0).toFixed(1) + ' dB'
+    ];
+    if (r.trimmedStartSamples || r.trimmedEndSamples) {
+      var trimmedMsStart = Math.round(1000 * r.trimmedStartSamples / r.sampleRate);
+      var trimmedMsEnd = Math.round(1000 * r.trimmedEndSamples / r.sampleRate);
+      techParts.push(t('adv_trimmed_info') + trimmedMsStart + ' ms / ' + trimmedMsEnd + ' ms');
+    }
+    document.getElementById('tech-details').textContent = techParts.join(' · ');
+  }
+
+  var resizeTimer = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(drawWaves, 120);
+  });
+
+  // Swaps the <audio> source between original/mastered while preserving
+  // playback position and play state, so A/B comparison doesn't restart
+  // the track from zero every time you switch.
+  function switchPreview(which){
+    var url = which === 'before' ? beforeObjectUrl : currentObjectUrl;
+    if (!url) return;
+    abBeforeBtn.classList.toggle('selected', which === 'before');
+    abAfterBtn.classList.toggle('selected', which === 'after');
+    if (previewAudio.src === url) return;
+    var resumeAt = previewAudio.currentTime || 0;
+    var wasPlaying = !previewAudio.paused && !previewAudio.ended;
+    var onReady = function(){
+      previewAudio.removeEventListener('loadedmetadata', onReady);
+      if (resumeAt > 0 && resumeAt < previewAudio.duration) previewAudio.currentTime = resumeAt;
+      if (wasPlaying) previewAudio.play().catch(function(){});
+    };
+    previewAudio.addEventListener('loadedmetadata', onReady);
+    previewAudio.src = url;
+  }
+  abBeforeBtn.addEventListener('click', function(){ switchPreview('before'); });
+  abAfterBtn.addEventListener('click', function(){ switchPreview('after'); });
+
+  // ---------------------------------------------------------------------
+  // Processing
+  // ---------------------------------------------------------------------
+  processBtn.addEventListener('click', function(){
+    if (!selectedFile || busy) return;
+    var bitDepth = getBitDepth();
+    var advanced = getAdvancedOpts();
+    // Checked here too (not only when the file is picked): multiband and
+    // trimming need extra memory and can be switched on afterwards.
+    var memErr = memoryCheckError(selectedFileInfo, bitDepth, advanced);
+    if (memErr) { hideResults(); setError(memErr.key, memErr.params); return; }
+    var jobId = ++jobCounter;
+    activeJobId = jobId;
+    var job = {
+      id: jobId,
+      file: selectedFile,
+      presetId: selectedPreset,
+      bitDepth: bitDepth,
+      advanced: advanced
+    };
+    hideResults();
+    setBusy(true);
+
+    runProcessing(job);
+  });
+
+  function failJob(job, code, rawMessage){
+    if (job.id !== activeJobId) return;
+    activeJobId = 0;
+    if (activeWorker) { try { activeWorker.terminate(); } catch(e){} activeWorker = null; }
+    setBusy(false);
+    var key = errorKeyForCode(code);
+    if (key) setError(key, { detail: '' });
+    else setError('', null, rawMessage || t('err_read_fail'));
+  }
+
+  function runProcessing(job){
+    setStatus('status_processing');
+
+    job.file.arrayBuffer().then(function(buf){
+      if (job.id !== activeJobId) return;
+      var worker = new Worker(workerUrl);
+      activeWorker = worker;
+      worker.onmessage = function(e){
+        var msg = e.data;
+        if (job.id !== activeJobId || msg.jobId !== job.id) { try { worker.terminate(); } catch(err){} return; }
+        if (msg.type === 'error') { failJob(job, msg.code, msg.message); return; }
+        if (msg.type !== 'done') return;
+
+        activeWorker = null;
+        worker.terminate();
+
+        // Silent input: nothing to master.
+        if (msg.silent) { activeJobId = 0; setBusy(false); setError('err_silent'); return; }
+
+        showResult(job, msg);
+      };
+      worker.onerror = function(err){
+        if (err && err.preventDefault) err.preventDefault();
+        var m = (err && err.message) || '';
+        failJob(job, /alloc|memory/i.test(m) ? 'OOM' : '', m || String(err));
+      };
+      worker.postMessage({ type: 'process', jobId: job.id, arrayBuffer: buf, presetId: job.presetId, bitDepth: job.bitDepth, advanced: job.advanced }, [buf]);
+    }).catch(function(err){
+      failJob(job, (err && /alloc|memory/i.test(err.message || '')) ? 'OOM' : '', err && err.message ? err.message : t('err_read_fail'));
+    });
+  }
+
+  function showResult(job, msg){
+    activeJobId = 0;
+    setBusy(false);
+
+    lastResult = {
+      input: msg.input, output: msg.output, preset: msg.preset,
+      appliedGainDb: msg.appliedGainDb, sampleRate: msg.sampleRate,
+      numChannels: msg.numChannels, bitDepth: msg.bitDepth,
+      limiterMaxReductionDb: msg.limiterMaxReductionDb, targetReached: msg.targetReached,
+      trimmedStartSamples: msg.trimmedStartSamples, trimmedEndSamples: msg.trimmedEndSamples,
+      peaksBefore: msg.peaksBefore, peaksAfter: msg.peaksAfter
+    };
+
+    if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = URL.createObjectURL(new Blob([msg.wavBuffer], { type: 'audio/wav' }));
+    var dlLink = document.getElementById('download-link');
+    dlLink.href = currentObjectUrl;
+    var baseName = (job.file.name || 'track').replace(/\.wave?$/i, '');
+    dlLink.setAttribute('download', baseName + '_dzmaster_' + msg.preset.id + '.wav');
+
+    // "Before" playback comes straight from the original File object
+    // (the ArrayBuffer was transferred to the worker).
+    if (beforeObjectUrl) URL.revokeObjectURL(beforeObjectUrl);
+    beforeObjectUrl = URL.createObjectURL(job.file);
+
+    abBeforeBtn.classList.remove('selected');
+    abAfterBtn.classList.add('selected');
+    previewAudio.src = currentObjectUrl;
+
+    setStatus('status_done');
+    renderResults();
+    results.classList.add('show');
+    drawWaves(); // after .show -- a hidden canvas has no width to draw into
+  }
+
+  // All DOM refs and handlers above are now wired up -- safe to paint the
+  // initial language.
+  initLang();
+
+})();
+</script>
+</body>
+</html>
