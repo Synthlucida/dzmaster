@@ -108,6 +108,21 @@
   .topbar-right{display:flex;align-items:center;gap:12px;}
   .home-link{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);color:var(--text-1);flex-shrink:0;}
   .home-link:hover{border-color:var(--accent-1);color:var(--text-0);}
+  .brand > span:last-child{min-width:0;}
+  .brand small{white-space:nowrap;}
+  .topbar-right{flex-shrink:0;}
+  @media (max-width:360px){
+    .topbar{padding:12px 12px;gap:8px;}
+    .brand{gap:8px;font-size:17px;}
+    .brand .logo{width:28px;height:28px;font-size:14px;flex-shrink:0;}
+    .brand small{font-size:9.5px;letter-spacing:.08em;}
+    .topbar-right{gap:8px;}
+    .home-link{width:32px;height:32px;}
+    .lang-toggle button{padding:5px 9px;font-size:12px;}
+  }
+  @media (max-width:300px){
+    .brand small{display:none;}
+  }
 
   main{padding:44px 0 90px;}
   .hero{text-align:center;margin-bottom:38px;}
@@ -179,7 +194,7 @@
 
 
 
-  .bitdepth{display:flex;gap:10px;align-items:center;margin-top:16px;font-size:13px;color:var(--text-1);}
+  .bitdepth{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:16px;font-size:13px;color:var(--text-1);}
   .bitdepth label{display:flex;align-items:center;gap:6px;cursor:pointer;}
 
   details.advanced{margin-top:18px;border-top:1px solid var(--line-soft);padding-top:14px;}
@@ -225,6 +240,44 @@
   .stat .before{color:var(--text-2);font-size:13px;text-decoration:line-through;opacity:.7;}
   .stat .after{font-size:19px;font-weight:800;color:var(--text-0);}
   .stat .after.good{color:var(--ok);}
+
+
+  /* ===== Graphic meters (after mastering) ===== */
+  .meters{margin:4px 0 18px;background:var(--bg-2);border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:16px 16px 6px;}
+  .meters-title{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);font-weight:700;margin-bottom:12px;}
+  .meter{margin-bottom:14px;}
+  .meter-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12.5px;color:var(--text-1);margin-bottom:5px;}
+  .meter-head{flex-wrap:wrap;row-gap:2px;}
+  .meter-head .mval{font-weight:800;color:var(--text-0);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto;}
+  @media (max-width:480px){
+    .meters{padding:14px 12px 4px;}
+    .meter-scale{font-size:10px;}
+    .meter-lr{grid-template-columns:14px 1fr 58px;gap:6px;}
+  }
+  .meter-track{position:relative;height:14px;border-radius:7px;background:#0b0d1d;border:1px solid var(--line-soft);overflow:hidden;}
+  .meter-fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:7px 0 0 7px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));transition:width .7s cubic-bezier(.2,.8,.2,1);}
+  .meter-fill.ok{background:linear-gradient(90deg,var(--accent-2),var(--ok));}
+  .meter-fill.warn{background:linear-gradient(90deg,var(--accent-2),var(--warn));}
+  .meter-fill.bad{background:linear-gradient(90deg,var(--warn),var(--err));}
+  .meter-fill.pink{background:linear-gradient(90deg,var(--accent-1),var(--accent-3));}
+  .meter-zone{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(135deg,rgba(255,107,139,.28) 0 4px,rgba(255,107,139,.08) 4px 8px);}
+  .meter-tick{position:absolute;top:-2px;bottom:-2px;width:2px;margin-left:-1px;border-radius:1px;}
+  .meter-tick.before{background:#aab0e6;}
+  .meter-tick.mark{background:#fff;box-shadow:0 0 6px rgba(255,255,255,.7);}
+  .meter-scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-2);margin-top:3px;font-variant-numeric:tabular-nums;}
+  .meter-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-2);margin:2px 0 12px;}
+  .meter-legend{flex-direction:column;gap:5px;}
+  .meter-legend i{display:inline-block;margin-right:8px;vertical-align:middle;}
+  .meter-legend i.sw-bar{width:22px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));}
+  .meter-legend i.sw-tick{width:2px;height:14px;border-radius:1px;margin:0 19px 0 9px;}
+  .meter-legend i.sw-before{background:#aab0e6;}
+  .meter-legend i.sw-mark{background:#fff;box-shadow:0 0 6px rgba(255,255,255,.7);}
+  .meter-legend .lg-colors{margin-top:2px;}
+  .meter-corr .meter-track::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line);}
+  .meter-corr .meter-fill{border-radius:0;}
+  .meter-lr{display:grid;grid-template-columns:18px 1fr 64px;gap:8px;align-items:center;margin-bottom:6px;font-size:12px;color:var(--text-1);}
+  .meter-lr .meter-track{height:10px;}
+  .meter-lr .lrv{text-align:right;font-variant-numeric:tabular-nums;color:var(--text-0);font-weight:700;}
 
   canvas.wave{width:100%;height:64px;display:block;border-radius:8px;background:var(--bg-2);border:1px solid var(--line-soft);margin-top:8px;}
   .wave-label{font-size:11.5px;color:var(--text-2);margin:14px 0 2px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
@@ -272,6 +325,7 @@
   footer a{color:var(--text-2);text-decoration:underline;}
   footer .wrap{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 10px;}
   footer .fitem{white-space:nowrap;}
+  @media (max-width:340px){ footer .fitem{white-space:normal;} }
 
   .privacy-note{display:flex;gap:10px;align-items:flex-start;background:rgba(75,227,164,.08);border:1px solid rgba(75,227,164,.25);padding:12px 14px;border-radius:12px;font-size:13px;color:var(--text-1);margin-top:16px;}
   .privacy-note svg{width:18px;height:18px;flex:none;color:var(--ok);margin-top:1px;}
@@ -543,6 +597,52 @@
         <div class="stat">
           <div class="label" data-i18n="stat_preset">Předvolba</div>
           <div class="after" id="stat-preset"></div>
+        </div>
+      </div>
+
+      <div class="meters" id="meters">
+        <div class="meters-title" data-i18n="meter_title">Měřáky po masteringu</div>
+        <div class="meter-legend">
+          <span><i class="sw-bar"></i><span data-i18n="meter_lg_after">pruh = hodnota po masteringu</span></span>
+          <span><i class="sw-tick sw-before"></i><span data-i18n="meter_lg_before">šedá čárka = originál (před masteringem)</span></span>
+          <span><i class="sw-tick sw-mark"></i><span data-i18n="meter_lg_mark">bílá čárka = cíl / strop předvolby (jen hlasitost a true peak)</span></span>
+          <span class="lg-colors" data-i18n="meter_lg_colors">Barva pruhu: zelená v pořádku · oranžová pozor / cíl nesplněn · červená překročeno</span>
+        </div>
+
+        <div class="meter" id="m-lufs">
+          <div class="meter-head"><span data-i18n="meter_lufs">Hlasitost (integrovaná)</span><span class="mval" id="m-lufs-val"></span></div>
+          <div class="meter-track"><div class="meter-fill" id="m-lufs-fill"></div><div class="meter-tick before" id="m-lufs-before"></div><div class="meter-tick mark" id="m-lufs-mark"></div></div>
+          <div class="meter-scale"><span>−36</span><span>−30</span><span>−24</span><span>−18</span><span>−12</span><span>−6</span><span>0 LUFS</span></div>
+        </div>
+
+        <div class="meter" id="m-tp">
+          <div class="meter-head"><span data-i18n="meter_tp">Špička (true peak)</span><span class="mval" id="m-tp-val"></span></div>
+          <div class="meter-track"><div class="meter-zone" id="m-tp-zone"></div><div class="meter-fill" id="m-tp-fill"></div><div class="meter-tick before" id="m-tp-before"></div><div class="meter-tick mark" id="m-tp-mark"></div></div>
+          <div class="meter-scale"><span>−12</span><span>−9</span><span>−6</span><span>−3</span><span>0</span><span>+3 dBTP</span></div>
+        </div>
+
+        <div class="meter" id="m-plr">
+          <div class="meter-head"><span data-i18n="meter_plr">Dynamika (špička − hlasitost, PLR)</span><span class="mval" id="m-plr-val"></span></div>
+          <div class="meter-track"><div class="meter-fill pink" id="m-plr-fill"></div><div class="meter-tick before" id="m-plr-before"></div></div>
+          <div class="meter-scale"><span data-i18n="meter_plr_lo">0 dB · stlačené</span><span>10</span><span data-i18n="meter_plr_hi">20 dB · dynamické</span></div>
+        </div>
+
+        <div class="meter" id="m-lim">
+          <div class="meter-head"><span data-i18n="meter_lim">Redukce limiteru (max.)</span><span class="mval" id="m-lim-val"></span></div>
+          <div class="meter-track"><div class="meter-fill" id="m-lim-fill"></div></div>
+          <div class="meter-scale"><span>0 dB</span><span>3</span><span>6</span><span>9</span><span>12 dB</span></div>
+        </div>
+
+        <div class="meter" id="m-lr">
+          <div class="meter-head"><span data-i18n="meter_lr">Úroveň kanálů (RMS)</span><span class="mval"></span></div>
+          <div class="meter-lr"><span>L</span><div class="meter-track"><div class="meter-fill" id="m-l-fill"></div></div><span class="lrv" id="m-l-val"></span></div>
+          <div class="meter-lr" id="m-r-row"><span>R</span><div class="meter-track"><div class="meter-fill" id="m-r-fill"></div></div><span class="lrv" id="m-r-val"></span></div>
+        </div>
+
+        <div class="meter meter-corr" id="m-corr">
+          <div class="meter-head"><span data-i18n="meter_corr">Stereo korelace (fáze)</span><span class="mval" id="m-corr-val"></span></div>
+          <div class="meter-track"><div class="meter-fill" id="m-corr-fill"></div><div class="meter-tick before" id="m-corr-before"></div></div>
+          <div class="meter-scale"><span data-i18n="meter_corr_lo">−1 · protifáze</span><span>0</span><span data-i18n="meter_corr_hi">+1 · mono</span></div>
         </div>
       </div>
 
@@ -2104,6 +2204,11 @@
       status_done: "Hotovo! Track je vyladěný a připravený ke stažení.",
       status_error: "Nastala chyba: ",
       stat_lufs: "Hlasitost (LUFS)", stat_peak: "Špička (True Peak)", stat_gain: "Aplikovaný gain", stat_preset: "Předvolba",
+      meter_title: "Měřáky po masteringu", meter_lg_after: "pruh = hodnota po masteringu", meter_lg_before: "šedá čárka = originál (před masteringem)", meter_lg_mark: "bílá čárka = cíl / strop předvolby (jen hlasitost a true peak)",
+      meter_lg_colors: "Barva pruhu: zelená v pořádku · oranžová pozor / cíl nesplněn · červená překročeno", meter_target: "cíl",
+      meter_lufs: "Hlasitost (integrovaná)", meter_tp: "Špička (true peak)", meter_plr: "Dynamika (špička − hlasitost, PLR)",
+      meter_plr_lo: "0 dB · stlačené", meter_plr_hi: "20 dB · dynamické", meter_lim: "Redukce limiteru (max.)",
+      meter_lr: "Úroveň kanálů (RMS)", meter_corr: "Stereo korelace (fáze)", meter_corr_lo: "−1 · protifáze", meter_corr_hi: "+1 · mono",
       wave_before: "Před", wave_after: "Po",
       ab_label: "Poslech:", ab_before: "🔈 Originál", ab_after: "✨ Mastrováno",
       download_btn: "Stáhnout mastrovaný WAV",
@@ -2216,6 +2321,11 @@
       status_done: "Done! Your track is mastered and ready to download.",
       status_error: "Something went wrong: ",
       stat_lufs: "Loudness (LUFS)", stat_peak: "Peak (True Peak)", stat_gain: "Gain applied", stat_preset: "Preset",
+      meter_title: "Meters after mastering", meter_lg_after: "bar = value after mastering", meter_lg_before: "grey tick = original (before mastering)", meter_lg_mark: "white tick = preset target / ceiling (loudness and true peak only)",
+      meter_lg_colors: "Bar colour: green OK · orange caution / target missed · red exceeded", meter_target: "target",
+      meter_lufs: "Loudness (integrated)", meter_tp: "Peak (true peak)", meter_plr: "Dynamics (peak − loudness, PLR)",
+      meter_plr_lo: "0 dB · squashed", meter_plr_hi: "20 dB · dynamic", meter_lim: "Limiter reduction (max.)",
+      meter_lr: "Channel level (RMS)", meter_corr: "Stereo correlation (phase)", meter_corr_lo: "−1 · out of phase", meter_corr_hi: "+1 · mono",
       wave_before: "Before", wave_after: "After",
       ab_label: "Listen to:", ab_before: "🔈 Original", ab_after: "✨ Mastered",
       download_btn: "Download mastered WAV",
@@ -2374,6 +2484,21 @@
     '  }',
     '  return out;',
     '}',
+    'function stereoStats(channels) {',
+    '  var n = channels[0].length, nc = channels.length;',
+    '  var sq = new Float64Array(nc), sLR = 0;',
+    '  for (var c = 0; c < nc; c++) { var ch = channels[c], a = 0; for (var i = 0; i < n; i++) { a += ch[i] * ch[i]; } sq[c] = a; }',
+    '  var rmsDb = [];',
+    '  for (var c2 = 0; c2 < nc; c2++) { var r = Math.sqrt(sq[c2] / Math.max(1, n)); rmsDb.push(r > 0 ? 20 * Math.log10(r) : -Infinity); }',
+    '  var corr = 1;',
+    '  if (nc >= 2) {',
+    '    var L = channels[0], R = channels[1];',
+    '    for (var j = 0; j < n; j++) { sLR += L[j] * R[j]; }',
+    '    var d = Math.sqrt(sq[0] * sq[1]);',
+    '    corr = d > 0 ? Math.max(-1, Math.min(1, sLR / d)) : 1;',
+    '  }',
+    '  return { rmsDb: rmsDb, corr: corr };',
+    '}',
     'self.onmessage = function(e) {',
     '  var msg = e.data;',
     '  try {',
@@ -2384,6 +2509,7 @@
     '      msg.arrayBuffer = null;',
     '      if (!decoded.frameCount) { var ne = new Error("No audio data"); ne.code = "NO_AUDIO"; throw ne; }',
     '      var peaksBefore = downsamplePeaks(decoded.channels, 600);',
+    '      var stereoBefore = stereoStats(decoded.channels);',
     '      var opts = msg.advanced || {};',
     // The worker has no further use for the decoded original, so the
     // engine may process it in place (no extra full-length copy).
@@ -2391,6 +2517,7 @@
     '      var result = DZMasterEngine.master(decoded, msg.presetId, opts);',
     '      decoded = null;',
     '      var peaksAfter = downsamplePeaks(result.channels, 600);',
+    '      var stereoAfter = stereoStats(result.channels);',
     '      var bits = msg.bitDepth === 24 ? 24 : 16;',
     // TPDF dither only when reducing to 16-bit (the common case).
     '      var encodeOpts = bits === 16 ? { dither: true } : undefined;',
@@ -2403,7 +2530,8 @@
     '        limiterMaxReductionDb: result.limiterMaxReductionDb,',
     '        targetReached: result.targetReached, silent: result.silent,',
     '        trimmedStartSamples: result.trimmedStartSamples, trimmedEndSamples: result.trimmedEndSamples,',
-    '        peaksBefore: peaksBefore, peaksAfter: peaksAfter',
+    '        peaksBefore: peaksBefore, peaksAfter: peaksAfter,',
+    '        stereoBefore: stereoBefore, stereoAfter: stereoAfter',
     '      }, [wavBuffer, peaksBefore.buffer, peaksAfter.buffer]);',
     '    }',
     '  } catch (err) {',
@@ -2887,6 +3015,7 @@
     document.getElementById('stat-preset').textContent = presetDisplayName(r.preset.id) +
       (r.preset.id === 'smart' ? ' (' + r.preset.targetLUFS + ' LUFS)' : '');
     document.getElementById('stat-lufs-after').classList.toggle('good', !!r.targetReached);
+    renderMeters();
 
     if (resultNote) {
       if (!r.targetReached && isFinite(r.output.lufs)) {
@@ -2911,6 +3040,90 @@
       techParts.push(t('adv_trimmed_info') + trimmedMsStart + ' ms / ' + trimmedMsEnd + ' ms');
     }
     document.getElementById('tech-details').textContent = techParts.join(' · ');
+  }
+
+
+  // ---------------------------------------------------------------------
+  // Graphic meters (values after mastering, original shown as a tick)
+  // ---------------------------------------------------------------------
+  function pct(v, lo, hi){
+    if (!isFinite(v)) return 0;
+    return Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+  }
+  function setFill(id, p, cls){
+    var el = document.getElementById(id);
+    el.style.width = p + '%';
+    el.classList.remove('ok','warn','bad','pink');
+    if (cls) el.classList.add(cls);
+  }
+  function setTick(id, p){
+    var el = document.getElementById(id);
+    if (p == null) { el.style.display = 'none'; return; }
+    el.style.display = ''; el.style.left = p + '%';
+  }
+  function fmtSigned(v, unit, digits){
+    if (!isFinite(v)) return '−∞ ' + unit;
+    return (v > 0 ? '+' : '') + v.toFixed(digits == null ? 1 : digits) + ' ' + unit;
+  }
+
+  function renderMeters(){
+    var r = lastResult;
+    if (!r) return;
+
+    // 1) Integrated loudness: -36..0 LUFS, white mark = preset target
+    var lo = r.output.lufs, li = r.input.lufs, target = r.preset.targetLUFS;
+    document.getElementById('m-lufs-val').textContent = fmtLUFS(lo) + (typeof target === 'number' ? '  (' + t('meter_target') + ' ' + target + ')' : '');
+    setFill('m-lufs-fill', pct(lo, -36, 0), r.targetReached ? 'ok' : 'warn');
+    setTick('m-lufs-before', isFinite(li) ? pct(li, -36, 0) : null);
+    setTick('m-lufs-mark', typeof target === 'number' ? pct(target, -36, 0) : null);
+
+    // 2) True peak: -12..+1 dBTP, hatched zone above the preset ceiling
+    var tp = r.output.truePeakDb, tpi = r.input.truePeakDb, ceil = r.preset.ceilingDbTP;
+    document.getElementById('m-tp-val').textContent = fmtSigned(tp, 'dBTP', 1) + '  (' + t('tech_ceiling') + ' ' + ceil + ')';
+    var cls = tp > ceil + 0.05 ? 'bad' : (tp > ceil - 0.5 ? 'warn' : 'ok');
+    setFill('m-tp-fill', pct(tp, -12, 3), cls);
+    setTick('m-tp-before', isFinite(tpi) ? pct(tpi, -12, 3) : null);
+    setTick('m-tp-mark', pct(ceil, -12, 3));
+    document.getElementById('m-tp-zone').style.width = (100 - pct(ceil, -12, 3)) + '%';
+
+    // 3) PLR = true peak - integrated loudness, 0..20 dB
+    var plrO = tp - lo, plrI = tpi - li;
+    document.getElementById('m-plr-val').textContent = isFinite(plrO) ? plrO.toFixed(1) + ' dB' : '—';
+    setFill('m-plr-fill', pct(plrO, 0, 20), 'pink');
+    setTick('m-plr-before', isFinite(plrI) ? pct(plrI, 0, 20) : null);
+
+    // 4) Limiter max gain reduction, 0..12 dB
+    var gr = r.limiterMaxReductionDb || 0;
+    document.getElementById('m-lim-val').textContent = gr.toFixed(1) + ' dB';
+    setFill('m-lim-fill', pct(gr, 0, 12), gr > 6 ? 'bad' : (gr > 3 ? 'warn' : 'ok'));
+
+    // 5) Channel RMS (dBFS), -48..0
+    var sa = r.stereoAfter, sb = r.stereoBefore;
+    var lrBox = document.getElementById('m-lr'), corrBox = document.getElementById('m-corr');
+    if (sa && sa.rmsDb) {
+      var rl = sa.rmsDb[0], rr = sa.rmsDb.length > 1 ? sa.rmsDb[1] : sa.rmsDb[0];
+      document.getElementById('m-l-val').textContent = isFinite(rl) ? rl.toFixed(1) + ' dB' : '−∞ dB';
+      document.getElementById('m-r-val').textContent = isFinite(rr) ? rr.toFixed(1) + ' dB' : '−∞ dB';
+      setFill('m-l-fill', pct(rl, -48, 0), 'pink');
+      setFill('m-r-fill', pct(rr, -48, 0), 'pink');
+      document.getElementById('m-r-row').style.display = r.numChannels >= 2 ? '' : 'none';
+      lrBox.querySelector('.meter-lr > span').textContent = r.numChannels >= 2 ? 'L' : 'M';
+      lrBox.style.display = '';
+    } else lrBox.style.display = 'none';
+
+    // 6) Stereo correlation -1..+1 (only for 2+ channels), bar grows from centre
+    if (sa && r.numChannels >= 2) {
+      var c = sa.corr;
+      document.getElementById('m-corr-val').textContent = (c > 0 ? '+' : '') + c.toFixed(2);
+      var fill = document.getElementById('m-corr-fill');
+      var pc = (c + 1) / 2 * 100;
+      fill.style.left = Math.min(50, pc) + '%';
+      fill.style.width = Math.abs(pc - 50) + '%';
+      fill.classList.remove('ok','warn','bad','pink');
+      fill.classList.add(c < 0 ? 'bad' : (c < 0.3 ? 'warn' : 'ok'));
+      setTick('m-corr-before', sb ? (sb.corr + 1) / 2 * 100 : null);
+      corrBox.style.display = '';
+    } else corrBox.style.display = 'none';
   }
 
   var resizeTimer = null;
@@ -3019,7 +3232,8 @@
       numChannels: msg.numChannels, bitDepth: msg.bitDepth,
       limiterMaxReductionDb: msg.limiterMaxReductionDb, targetReached: msg.targetReached,
       trimmedStartSamples: msg.trimmedStartSamples, trimmedEndSamples: msg.trimmedEndSamples,
-      peaksBefore: msg.peaksBefore, peaksAfter: msg.peaksAfter
+      peaksBefore: msg.peaksBefore, peaksAfter: msg.peaksAfter,
+      stereoBefore: msg.stereoBefore, stereoAfter: msg.stereoAfter
     };
 
     if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
