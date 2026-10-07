@@ -223,6 +223,17 @@
   }
   button.primary:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
   button.primary:not(:disabled):hover{filter:brightness(1.07);}
+  button.secondary{
+    background:transparent; color:var(--text-0); border:1px solid var(--line);
+    font-weight:700; font-size:15px; padding:13px 22px; border-radius:12px; cursor:pointer; font-family:inherit;
+  }
+  button.secondary:disabled{opacity:.4;cursor:not-allowed;}
+  button.secondary:not(:disabled):hover{border-color:var(--accent-1);}
+  .bpm-only{display:none;margin-top:16px;background:var(--bg-2);border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:14px;}
+  .bpm-only.show{display:block;}
+  .bpm-only .label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);font-weight:700;}
+  .bpm-only .after{font-size:26px;font-weight:800;color:var(--text-0);}
+  .bpm-only .bpm-note{font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.35;}
   .status-line{font-size:13.5px;color:var(--text-1);}
   .status-line.err{color:var(--err);}
 
@@ -240,6 +251,7 @@
   .stat .before{color:var(--text-2);font-size:13px;text-decoration:line-through;opacity:.7;}
   .stat .after{font-size:19px;font-weight:800;color:var(--text-0);}
   .stat .after.good{color:var(--ok);}
+  .stat .bpm-note{font-size:11.5px;color:var(--text-2);margin-top:2px;line-height:1.35;}
 
 
   /* ===== Graphic meters (after mastering) ===== */
@@ -572,10 +584,17 @@
 
     <div class="process-row">
       <button class="primary" id="process-btn" disabled data-i18n="process_btn">Zpracovat track</button>
+      <button type="button" class="secondary" id="bpm-btn" disabled data-i18n="bpm_btn">Jen změřit BPM</button>
       <span class="status-line" id="status-line" data-i18n="status_idle">Nejdřív nahrajte WAV soubor.</span>
     </div>
 
     <div class="progress" id="progress"><div class="bar"></div></div>
+
+    <div class="bpm-only" id="bpm-only" aria-live="polite">
+      <div class="label" data-i18n="bpm_only_title">Změřené tempo</div>
+      <div class="after" id="bpm-only-val"></div>
+      <div class="bpm-note" id="bpm-only-note"></div>
+    </div>
 
     <div class="results" id="results">
       <div class="result-note" id="result-note" hidden></div>
@@ -593,6 +612,11 @@
         <div class="stat">
           <div class="label" data-i18n="stat_gain">Aplikovaný gain</div>
           <div class="after" id="stat-gain"></div>
+        </div>
+        <div class="stat" id="stat-bpm-box">
+          <div class="label" data-i18n="stat_bpm">Tempo (BPM)</div>
+          <div class="after" id="stat-bpm"></div>
+          <div class="bpm-note" id="stat-bpm-note"></div>
         </div>
         <div class="stat">
           <div class="label" data-i18n="stat_preset">Předvolba</div>
@@ -2077,12 +2101,168 @@
     };
   }
 
+  // ---------------------------------------------------------------------
+  // Tempo (BPM) estimate
+  //
+  // Onset strength = half-wave-rectified spectral flux of the (decimated,
+  // mono) signal, autocorrelated; each candidate tempo is scored by how
+  // well the autocorrelation lines up at its 1x..4x beat lengths, weighted
+  // by a gentle prior around 120 BPM so half/double-tempo ties resolve the
+  // usual way. Works on the ORIGINAL audio (call it before master()), looks
+  // at no more than 4 minutes from the middle of the track, and never
+  // modifies the input. Returns null when the audio is too short, or
+  // { bpm, confidence (0..1), alt } -- alt = a plausible half/double tempo
+  // or 0. Music without a steady pulse (ambient pads, rubato) gives a low
+  // confidence: the caller decides what to show.
+  // ---------------------------------------------------------------------
+  function bpmFft(re, im, n, cosT, sinT, rev) {
+    for (var i = 0; i < n; i++) {
+      var j = rev[i];
+      if (j > i) { var tr = re[i]; re[i] = re[j]; re[j] = tr; var ti = im[i]; im[i] = im[j]; im[j] = ti; }
+    }
+    for (var size = 2; size <= n; size <<= 1) {
+      var half = size >> 1, step = n / size;
+      for (var s = 0; s < n; s += size) {
+        for (var k = 0, tw = 0; k < half; k++, tw += step) {
+          var a = s + k, b = a + half;
+          var xr = re[b] * cosT[tw] + im[b] * sinT[tw];
+          var xi = im[b] * cosT[tw] - re[b] * sinT[tw];
+          re[b] = re[a] - xr; im[b] = im[a] - xi;
+          re[a] += xr; im[a] += xi;
+        }
+      }
+    }
+  }
+
+  function detectBpm(channels, sampleRate) {
+    var nch = channels.length;
+    var total = channels[0].length;
+    var MAX_SEC = 240, MIN_SEC = 8;
+    if (!(sampleRate > 0) || total / sampleRate < MIN_SEC) return null;
+    var len = Math.min(total, Math.floor(MAX_SEC * sampleRate));
+    var start = Math.floor((total - len) / 2);
+    var dec = Math.max(1, Math.round(sampleRate / 11025));
+    var fs = sampleRate / dec;
+    var nd = Math.floor(len / dec);
+    var x = new Float32Array(nd);
+    var sumSq = 0, i, c, j;
+    for (i = 0; i < nd; i++) {
+      var acc = 0, base = start + i * dec;
+      for (c = 0; c < nch; c++) { var ch = channels[c]; for (j = 0; j < dec; j++) acc += ch[base + j]; }
+      var v = acc / (dec * nch);
+      x[i] = v; sumSq += v * v;
+    }
+    var rmsX = Math.sqrt(sumSq / nd);
+    if (!(rmsX > 1e-5)) return null; // (near) silence
+    var inv = 1 / rmsX;
+
+    var N = 512, HOP = 128;
+    var frames = Math.floor((nd - N) / HOP) + 1;
+    if (frames < 200) return null;
+    var fps = fs / HOP;
+
+    // FFT tables
+    var cosT = new Float64Array(N / 2), sinT = new Float64Array(N / 2), rev = new Uint16Array(N), win = new Float64Array(N);
+    for (i = 0; i < N / 2; i++) { cosT[i] = Math.cos(2 * Math.PI * i / N); sinT[i] = Math.sin(2 * Math.PI * i / N); }
+    var bits = Math.round(Math.log(N) / Math.LN2);
+    for (i = 0; i < N; i++) {
+      var r = 0; for (j = 0; j < bits; j++) if (i & (1 << j)) r |= 1 << (bits - 1 - j);
+      rev[i] = r;
+      win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N);
+    }
+    var re = new Float64Array(N), im = new Float64Array(N);
+    var bins = N / 2;
+    var prev = new Float64Array(bins);
+    var onset = new Float32Array(frames);
+    for (var f = 0; f < frames; f++) {
+      var off = f * HOP;
+      for (i = 0; i < N; i++) { re[i] = x[off + i] * inv * win[i]; im[i] = 0; }
+      bpmFft(re, im, N, cosT, sinT, rev);
+      var flux = 0;
+      for (var k = 2; k < bins; k++) {
+        var lm = Math.log(1 + Math.sqrt(re[k] * re[k] + im[k] * im[k]));
+        if (f > 0) { var dlt = lm - prev[k]; if (dlt > 0) flux += dlt; }
+        prev[k] = lm;
+      }
+      onset[f] = flux;
+    }
+    x = null;
+
+    // Detrend: subtract a ~0.5 s moving average, keep positive part.
+    var w = Math.max(3, Math.round(0.5 * fps)), csum = new Float64Array(frames + 1);
+    for (i = 0; i < frames; i++) csum[i + 1] = csum[i] + onset[i];
+    var env = new Float32Array(frames), energy = 0;
+    for (i = 0; i < frames; i++) {
+      var lo = Math.max(0, i - w), hi = Math.min(frames, i + w + 1);
+      var m = (csum[hi] - csum[lo]) / (hi - lo);
+      var e = onset[i] - m; if (e < 0) e = 0;
+      env[i] = e; energy += e * e;
+    }
+    // Stationary sound (a held tone, a pure drone) has next to no onsets:
+    // whatever the autocorrelation then shows is rounding noise.
+    if (!(energy > 1e-9) || csum[frames] / frames < 0.5) return null;
+
+    // Autocorrelation (unbiased), lags up to 4 beats of the slowest tempo.
+    var BPM_LO = 55, BPM_HI = 215;
+    var maxLag = Math.min(Math.ceil(4 * 60 * fps / BPM_LO) + 3, Math.floor(frames / 2));
+    var acf = new Float64Array(maxLag + 2);
+    for (var lag = 0; lag <= maxLag; lag++) {
+      var sacc = 0, cnt = frames - lag;
+      for (i = 0; i < cnt; i++) sacc += env[i] * env[i + lag];
+      acf[lag] = sacc / cnt;
+    }
+    var a0 = acf[0];
+    if (!(a0 > 0)) return null;
+    for (i = 0; i <= maxLag; i++) acf[i] /= a0;
+    function acfAt(l) {
+      if (l < 1) return 0;
+      var i0 = Math.floor(l);
+      if (i0 >= maxLag) return 0;
+      var fr = l - i0;
+      return acf[i0] * (1 - fr) + acf[i0 + 1] * fr;
+    }
+    var HW = [1, 0.8, 0.6, 0.45];
+    function rawScore(bpm) {
+      var L = 60 * fps / bpm, s = 0, ws = 0;
+      for (var h = 1; h <= 4; h++) {
+        var lh = L * h;
+        if (lh >= maxLag) break;
+        s += HW[h - 1] * acfAt(lh); ws += HW[h - 1];
+      }
+      return ws > 0 ? s / ws : 0;
+    }
+    function prior(bpm) { var o = Math.log(bpm / 120) / Math.LN2; return Math.exp(-0.5 * o * o / (0.9 * 0.9)); }
+
+    var best = 0, bestVal = -1, scores = [], g;
+    for (g = BPM_LO; g <= BPM_HI; g += 0.25) {
+      var sc = rawScore(g); scores.push(sc);
+      var wv = sc * prior(g);
+      if (wv > bestVal) { bestVal = wv; best = g; }
+    }
+    // Fine search around the winner (no prior).
+    var fb = best, fv = -1;
+    for (g = best * 0.985; g <= best * 1.015; g += 0.02) { var s2 = rawScore(g); if (s2 > fv) { fv = s2; fb = g; } }
+    var sorted = scores.slice().sort(function (a, b) { return a - b; });
+    var med = sorted[sorted.length >> 1];
+    var conf = fv > 0 ? Math.max(0, Math.min(1, (fv - med) / fv)) : 0;
+
+    var alt = 0, altVal = 0, cands = [fb / 2, fb * 2];
+    for (i = 0; i < 2; i++) {
+      var cb = cands[i];
+      if (cb < BPM_LO || cb > BPM_HI) continue;
+      var cs = rawScore(cb);
+      if (cs >= 0.5 * fv && cs > altVal) { altVal = cs; alt = cb; }
+    }
+    return { bpm: Math.round(fb * 10) / 10, confidence: conf, alt: alt ? Math.round(alt) : 0 };
+  }
+
   return {
     PRESETS: PRESETS,
     parseWav: parseWav,
     encodeWav: encodeWav,
     analyze: analyze,
     master: master,
+    detectBpm: detectBpm,
     // exported for testing:
     _internal: {
       makeBiquad: makeBiquad,
@@ -2204,6 +2384,7 @@
       status_done: "Hotovo! Track je vyladěný a připravený ke stažení.",
       status_error: "Nastala chyba: ",
       stat_lufs: "Hlasitost (LUFS)", stat_peak: "Špička (True Peak)", stat_gain: "Aplikovaný gain", stat_preset: "Předvolba",
+      stat_bpm: "Tempo (BPM)", bpm_btn: "Jen změřit BPM", bpm_only_title: "Změřené tempo", status_bpm_processing: "Měřím tempo…", status_bpm_done: "Tempo změřeno. Track zůstal beze změny.", bpm_unknown: "nelze určit", bpm_unknown_note: "Bez dost výrazného pravidelného rytmu se tempo spolehlivě odhadnout nedá.", bpm_short_note: "Stopa je na odhad tempa příliš krátká (min. 8 s).", bpm_approx_note: "orientační odhad", bpm_alt_note: "možné je i {alt} BPM",
       meter_title: "Měřáky po masteringu", meter_lg_after: "pruh = hodnota po masteringu", meter_lg_before: "šedá čárka = originál (před masteringem)", meter_lg_mark: "bílá čárka = cíl / strop předvolby (jen hlasitost a true peak)",
       meter_lg_colors: "Barva pruhu: zelená v pořádku · oranžová pozor / cíl nesplněn · červená překročeno", meter_target: "cíl",
       meter_lufs: "Hlasitost (integrovaná)", meter_tp: "Špička (true peak)", meter_plr: "Dynamika (špička − hlasitost, PLR)",
@@ -2214,7 +2395,7 @@
       download_btn: "Stáhnout mastrovaný WAV",
       tech_summary: "Technické detaily zpracování",
       how_kicker: "Jak to funguje", how_title: "Co DZMASTER dělá s vaší stopou",
-      how_q1: "1. Analýza", how_a1: "Nástroj změří integrovanou hlasitost (LUFS podle ITU‑R BS.1770), špičkovou úroveň a dynamiku skladby.",
+      how_q1: "1. Analýza", how_a1: "Nástroj změří integrovanou hlasitost (LUFS podle ITU‑R BS.1770), špičkovou úroveň a dynamiku skladby a odhadne tempo (BPM).",
       how_q2: "2. Čištění a jemná komprese", how_a2: 'Odstraní se stejnosměrná složka a neslyšitelný rachot pod 20 Hz, poté jemný "glue" kompresor (ve výchozím nastavení jednopásmový) mírně vyrovná dynamiku.',
       how_q3: "3. Vyrovnání hlasitosti", how_a3: "Track se zesílí nebo zeslabí na přesnou cílovou hlasitost zvolené předvolby.",
       how_q4: "4. Bezpečný limiter", how_a4: "Look-ahead limiter zajistí, že špičky nikdy nepřekročí bezpečný strop zvolené předvolby (−1 dBTP u většiny předvoleb, −1.5 dBTP u Vinylu a −3 dBTP u Podcastu/Audioknihy) — nedojde tak k ořezání při přehrávání na streamovacích službách ani po kompresi do MP3/AAC.",
@@ -2321,6 +2502,7 @@
       status_done: "Done! Your track is mastered and ready to download.",
       status_error: "Something went wrong: ",
       stat_lufs: "Loudness (LUFS)", stat_peak: "Peak (True Peak)", stat_gain: "Gain applied", stat_preset: "Preset",
+      stat_bpm: "Tempo (BPM)", bpm_btn: "Measure BPM only", bpm_only_title: "Measured tempo", status_bpm_processing: "Measuring tempo…", status_bpm_done: "Tempo measured. Your track was left untouched.", bpm_unknown: "unknown", bpm_unknown_note: "Without a clear, steady rhythm the tempo can't be estimated reliably.", bpm_short_note: "Track is too short for a tempo estimate (8 s minimum).", bpm_approx_note: "rough estimate", bpm_alt_note: "{alt} BPM is possible too",
       meter_title: "Meters after mastering", meter_lg_after: "bar = value after mastering", meter_lg_before: "grey tick = original (before mastering)", meter_lg_mark: "white tick = preset target / ceiling (loudness and true peak only)",
       meter_lg_colors: "Bar colour: green OK · orange caution / target missed · red exceeded", meter_target: "target",
       meter_lufs: "Loudness (integrated)", meter_tp: "Peak (true peak)", meter_plr: "Dynamics (peak − loudness, PLR)",
@@ -2331,7 +2513,7 @@
       download_btn: "Download mastered WAV",
       tech_summary: "Technical processing details",
       how_kicker: "How it works", how_title: "What DZMASTER does to your track",
-      how_q1: "1. Analysis", how_a1: "Measures integrated loudness (LUFS per ITU‑R BS.1770), peak level and dynamic range.",
+      how_q1: "1. Analysis", how_a1: "Measures integrated loudness (LUFS per ITU‑R BS.1770), peak level and dynamic range, and estimates the tempo (BPM).",
       how_q2: "2. Cleanup & gentle glue compression", how_a2: "Removes DC offset and inaudible sub-20Hz rumble, then a gentle glue compressor (single-band by default) slightly evens out dynamics.",
       how_q3: "3. Loudness matching", how_a3: "The track is turned up or down to hit the exact target loudness of the chosen preset.",
       how_q4: "4. Safe limiting", how_a4: "A look-ahead limiter guarantees peaks never exceed the chosen preset's safe ceiling (−1 dBTP for most presets, −1.5 dBTP for Vinyl, and −3 dBTP for Podcast/Audiobook) — preventing clipping during streaming playback or lossy (MP3/AAC) encoding.",
@@ -2440,6 +2622,7 @@
     renderStatus();
     if (typeof refreshFileMeta === 'function') refreshFileMeta();
     if (typeof renderResults === 'function') renderResults();
+    if (typeof renderBpmOnly === 'function') renderBpmOnly();
   }
 
   document.getElementById('lang-cs').addEventListener('click', function(){ applyLanguage('cs'); });
@@ -2499,9 +2682,22 @@
     '  }',
     '  return { rmsDb: rmsDb, corr: corr };',
     '}',
+    'function tempoOf(decoded) {',
+    '  var info = null;',
+    '  try { info = DZMasterEngine.detectBpm(decoded.channels, decoded.sampleRate); } catch (err) { info = null; }',
+    '  if (info) return info;',
+    '  return { bpm: 0, confidence: 0, alt: 0, short: decoded.frameCount / decoded.sampleRate < 8 };',
+    '}',
     'self.onmessage = function(e) {',
     '  var msg = e.data;',
     '  try {',
+    '    if (msg.type === "bpm") {',
+    '      var bd = DZMasterEngine.parseWav(msg.arrayBuffer);',
+    '      msg.arrayBuffer = null;',
+    '      if (!bd.frameCount) { var be = new Error("No audio data"); be.code = "NO_AUDIO"; throw be; }',
+    '      self.postMessage({ type: "bpmDone", jobId: msg.jobId, bpm: tempoOf(bd) });',
+    '      return;',
+    '    }',
     '    if (msg.type === "process") {',
     '      var decoded = DZMasterEngine.parseWav(msg.arrayBuffer);',
     // The raw file bytes are no longer needed once decoded -- drop them so
@@ -2509,6 +2705,9 @@
     '      msg.arrayBuffer = null;',
     '      if (!decoded.frameCount) { var ne = new Error("No audio data"); ne.code = "NO_AUDIO"; throw ne; }',
     '      var peaksBefore = downsamplePeaks(decoded.channels, 600);',
+    // Tempo is measured on the untouched original, before master() works on it in place.
+    // A failure here must never cost the user their mastering.
+    '      var bpmInfo = tempoOf(decoded);',
     '      var stereoBefore = stereoStats(decoded.channels);',
     '      var opts = msg.advanced || {};',
     // The worker has no further use for the decoded original, so the
@@ -2531,7 +2730,7 @@
     '        targetReached: result.targetReached, silent: result.silent,',
     '        trimmedStartSamples: result.trimmedStartSamples, trimmedEndSamples: result.trimmedEndSamples,',
     '        peaksBefore: peaksBefore, peaksAfter: peaksAfter,',
-    '        stereoBefore: stereoBefore, stereoAfter: stereoAfter',
+    '        stereoBefore: stereoBefore, stereoAfter: stereoAfter, bpm: bpmInfo',
     '      }, [wavBuffer, peaksBefore.buffer, peaksAfter.buffer]);',
     '    }',
     '  } catch (err) {',
@@ -2620,6 +2819,8 @@
   var fileMeta = document.getElementById('file-meta');
   var fileClear = document.getElementById('file-clear');
   var processBtn = document.getElementById('process-btn');
+  var bpmBtn = document.getElementById('bpm-btn');
+  var bpmOnlyBox = document.getElementById('bpm-only');
   var progress = document.getElementById('progress');
   var results = document.getElementById('results');
   var resultNote = document.getElementById('result-note');
@@ -2844,6 +3045,7 @@
   // ---------------------------------------------------------------------
   function updateProcessButton(){
     processBtn.disabled = !selectedFile || busy;
+    bpmBtn.disabled = !selectedFile || busy;
   }
 
   function stopPreview(){
@@ -2877,6 +3079,7 @@
     fileInfo.style.display = 'flex';
     dropzone.style.display = 'none';
     lastResult = null;
+    lastBpmOnly = null; renderBpmOnly();
     hideResults();
     updateProcessButton();
     setStatus('status_ready');
@@ -2933,6 +3136,7 @@
     selectedFile = null;
     selectedFileInfo = null;
     lastResult = null;
+    lastBpmOnly = null; renderBpmOnly();
     fileInput.value = '';
     fileInfo.style.display = 'none';
     dropzone.style.display = 'block';
@@ -3002,6 +3206,28 @@
     drawWave(document.getElementById('wave-after'), lastResult.peaksAfter);
   }
 
+  // Tempo tile. bpm = null (track too short) or { bpm, confidence, alt };
+  // a low-confidence estimate is not shown as if it were a measurement.
+  function renderBpm(b, valId, noteId){
+    var val = document.getElementById(valId || 'stat-bpm'), note = document.getElementById(noteId || 'stat-bpm-note');
+    if (!val || !note) return;
+    if (!b || b.short) { val.textContent = '—'; note.textContent = t('bpm_short_note'); return; }
+    if (!(b.confidence >= 0.5)) { val.textContent = t('bpm_unknown'); note.textContent = t('bpm_unknown_note'); return; }
+    var shown = Math.abs(b.bpm - Math.round(b.bpm)) < 0.15 ? String(Math.round(b.bpm)) : b.bpm.toFixed(1);
+    var parts = [];
+    if (b.confidence < 0.75) parts.push(t('bpm_approx_note'));
+    if (b.alt) parts.push(tf('bpm_alt_note', { alt: b.alt }));
+    val.textContent = (b.confidence < 0.75 ? '~' : '') + shown + ' BPM';
+    note.textContent = parts.join(' · ');
+  }
+
+  var lastBpmOnly = null; // result of the stand-alone "measure BPM only" run
+  function renderBpmOnly(){
+    if (!lastBpmOnly) { bpmOnlyBox.classList.remove('show'); return; }
+    renderBpm(lastBpmOnly.bpm, 'bpm-only-val', 'bpm-only-note');
+    bpmOnlyBox.classList.add('show');
+  }
+
   // Everything language-dependent in the results panel is rendered from
   // lastResult, so switching CZ/EN afterwards re-translates it too.
   function renderResults(){
@@ -3015,6 +3241,7 @@
     document.getElementById('stat-preset').textContent = presetDisplayName(r.preset.id) +
       (r.preset.id === 'smart' ? ' (' + r.preset.targetLUFS + ' LUFS)' : '');
     document.getElementById('stat-lufs-after').classList.toggle('good', !!r.targetReached);
+    renderBpm(r.bpm);
     renderMeters();
 
     if (resultNote) {
@@ -3180,6 +3407,15 @@
     runProcessing(job);
   });
 
+  bpmBtn.addEventListener('click', function(){
+    if (!selectedFile || busy) return;
+    var jobId = ++jobCounter;
+    activeJobId = jobId;
+    bpmOnlyBox.classList.remove('show');
+    setBusy(true);
+    runProcessing({ id: jobId, file: selectedFile, mode: 'bpm' });
+  });
+
   function failJob(job, code, rawMessage){
     if (job.id !== activeJobId) return;
     activeJobId = 0;
@@ -3191,7 +3427,7 @@
   }
 
   function runProcessing(job){
-    setStatus('status_processing');
+    setStatus(job.mode === 'bpm' ? 'status_bpm_processing' : 'status_processing');
 
     job.file.arrayBuffer().then(function(buf){
       if (job.id !== activeJobId) return;
@@ -3201,6 +3437,14 @@
         var msg = e.data;
         if (job.id !== activeJobId || msg.jobId !== job.id) { try { worker.terminate(); } catch(err){} return; }
         if (msg.type === 'error') { failJob(job, msg.code, msg.message); return; }
+        if (msg.type === 'bpmDone') {
+          activeWorker = null; worker.terminate();
+          activeJobId = 0; setBusy(false);
+          lastBpmOnly = { bpm: msg.bpm };
+          renderBpmOnly();
+          setStatus('status_bpm_done');
+          return;
+        }
         if (msg.type !== 'done') return;
 
         activeWorker = null;
@@ -3216,6 +3460,7 @@
         var m = (err && err.message) || '';
         failJob(job, /alloc|memory/i.test(m) ? 'OOM' : '', m || String(err));
       };
+      if (job.mode === 'bpm') { worker.postMessage({ type: 'bpm', jobId: job.id, arrayBuffer: buf }, [buf]); return; }
       worker.postMessage({ type: 'process', jobId: job.id, arrayBuffer: buf, presetId: job.presetId, bitDepth: job.bitDepth, advanced: job.advanced }, [buf]);
     }).catch(function(err){
       failJob(job, (err && /alloc|memory/i.test(err.message || '')) ? 'OOM' : '', err && err.message ? err.message : t('err_read_fail'));
@@ -3233,7 +3478,8 @@
       limiterMaxReductionDb: msg.limiterMaxReductionDb, targetReached: msg.targetReached,
       trimmedStartSamples: msg.trimmedStartSamples, trimmedEndSamples: msg.trimmedEndSamples,
       peaksBefore: msg.peaksBefore, peaksAfter: msg.peaksAfter,
-      stereoBefore: msg.stereoBefore, stereoAfter: msg.stereoAfter
+      stereoBefore: msg.stereoBefore, stereoAfter: msg.stereoAfter,
+      bpm: msg.bpm || null
     };
 
     if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
