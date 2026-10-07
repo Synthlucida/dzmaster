@@ -294,6 +294,14 @@
   canvas.wave{width:100%;height:64px;display:block;border-radius:8px;background:var(--bg-2);border:1px solid var(--line-soft);margin-top:8px;}
   .wave-label{font-size:11.5px;color:var(--text-2);margin:14px 0 2px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
 
+  .vu-block{margin-top:18px;}
+  .vu-title{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);font-weight:700;margin-bottom:10px;}
+  .vu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+  .vu-cell{background:var(--bg-2);border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:10px 10px 12px;min-width:0;}
+  .vu-dial svg{display:block;width:100%;height:auto;border-radius:8px;}
+  .vu-read{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text-2);margin-top:8px;}
+  .vu-read b{font-size:15px;color:var(--text-0);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .vu-hint{font-size:11.5px;color:var(--text-2);margin-top:8px;line-height:1.4;}
   .ab-toggle{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:18px;}
   .ab-toggle .ab-label{font-size:11.5px;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
   .ab-toggle .ab-btn{border:1px solid var(--line);background:var(--bg-2);color:var(--text-1);padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;}
@@ -681,6 +689,16 @@
         <button type="button" class="ab-btn selected" id="ab-after" data-i18n="ab_after">✨ Mastrováno</button>
       </div>
       <audio id="preview-audio" controls preload="metadata"></audio>
+
+      <div class="vu-block" id="vu-block">
+        <div class="vu-title" data-i18n="vu_title">Živé měřáky (hýbou se při přehrávání)</div>
+        <div class="vu-grid">
+          <div class="vu-cell"><div class="vu-dial" id="vu-dial-rms"></div><div class="vu-read"><span data-i18n="vu_rms">Průměr (RMS)</span><b id="vu-val-rms">—</b></div></div>
+          <div class="vu-cell"><div class="vu-dial" id="vu-dial-peak"></div><div class="vu-read"><span data-i18n="vu_peak">Špička</span><b id="vu-val-peak">—</b></div></div>
+          <div class="vu-cell"><div class="vu-dial" id="vu-dial-lufs"></div><div class="vu-read"><span data-i18n="vu_lufs">Hlasitost (LUFS-M)</span><b id="vu-val-lufs">—</b></div></div>
+        </div>
+        <div class="vu-hint" data-i18n="vu_hint">Ručičky ukazují to, co právě slyšíš. Přepnutím Originál / Mastrováno porovnáš obě verze. LUFS-M je okamžitá hlasitost za posledních 0,4 s.</div>
+      </div>
 
       <div>
         <a class="download-btn" id="download-link" download="mastered.wav">
@@ -2385,6 +2403,7 @@
       status_error: "Nastala chyba: ",
       stat_lufs: "Hlasitost (LUFS)", stat_peak: "Špička (True Peak)", stat_gain: "Aplikovaný gain", stat_preset: "Předvolba",
       stat_bpm: "Tempo (BPM)", bpm_btn: "Jen změřit BPM", bpm_only_title: "Změřené tempo", status_bpm_processing: "Měřím tempo…", status_bpm_done: "Tempo změřeno. Track zůstal beze změny.", bpm_unknown: "nelze určit", bpm_unknown_note: "Bez dost výrazného pravidelného rytmu se tempo spolehlivě odhadnout nedá.", bpm_short_note: "Stopa je na odhad tempa příliš krátká (min. 8 s).", bpm_approx_note: "orientační odhad", bpm_alt_note: "možné je i {alt} BPM",
+      vu_title: "Živé měřáky (hýbou se při přehrávání)", vu_rms: "Průměr (RMS)", vu_peak: "Špička", vu_lufs: "Hlasitost (LUFS-M)", vu_hint: "Ručičky ukazují to, co právě slyšíš. Přepnutím Originál / Mastrováno porovnáš obě verze. LUFS-M je okamžitá hlasitost za posledních 0,4 s.",
       meter_title: "Měřáky po masteringu", meter_lg_after: "pruh = hodnota po masteringu", meter_lg_before: "šedá čárka = originál (před masteringem)", meter_lg_mark: "bílá čárka = cíl / strop předvolby (jen hlasitost a true peak)",
       meter_lg_colors: "Barva pruhu: zelená v pořádku · oranžová pozor / cíl nesplněn · červená překročeno", meter_target: "cíl",
       meter_lufs: "Hlasitost (integrovaná)", meter_tp: "Špička (true peak)", meter_plr: "Dynamika (špička − hlasitost, PLR)",
@@ -2503,6 +2522,7 @@
       status_error: "Something went wrong: ",
       stat_lufs: "Loudness (LUFS)", stat_peak: "Peak (True Peak)", stat_gain: "Gain applied", stat_preset: "Preset",
       stat_bpm: "Tempo (BPM)", bpm_btn: "Measure BPM only", bpm_only_title: "Measured tempo", status_bpm_processing: "Measuring tempo…", status_bpm_done: "Tempo measured. Your track was left untouched.", bpm_unknown: "unknown", bpm_unknown_note: "Without a clear, steady rhythm the tempo can't be estimated reliably.", bpm_short_note: "Track is too short for a tempo estimate (8 s minimum).", bpm_approx_note: "rough estimate", bpm_alt_note: "{alt} BPM is possible too",
+      vu_title: "Live meters (they move while playing)", vu_rms: "Average (RMS)", vu_peak: "Peak", vu_lufs: "Loudness (LUFS-M)", vu_hint: "The needles show what you are hearing right now. Switch Original / Mastered to compare both versions. LUFS-M is the momentary loudness over the last 0.4 s.",
       meter_title: "Meters after mastering", meter_lg_after: "bar = value after mastering", meter_lg_before: "grey tick = original (before mastering)", meter_lg_mark: "white tick = preset target / ceiling (loudness and true peak only)",
       meter_lg_colors: "Bar colour: green OK · orange caution / target missed · red exceeded", meter_target: "target",
       meter_lufs: "Loudness (integrated)", meter_tp: "Peak (true peak)", meter_plr: "Dynamics (peak − loudness, PLR)",
@@ -3242,6 +3262,7 @@
       (r.preset.id === 'smart' ? ' (' + r.preset.targetLUFS + ' LUFS)' : '');
     document.getElementById('stat-lufs-after').classList.toggle('good', !!r.targetReached);
     renderBpm(r.bpm);
+    if (typeof LiveMeters !== 'undefined' && LiveMeters) { LiveMeters.setChannels(r.numChannels); LiveMeters.setMarks(r.preset.targetLUFS, r.preset.ceilingDbTP); }
     renderMeters();
 
     if (resultNote) {
@@ -3503,6 +3524,206 @@
     results.classList.add('show');
     drawWaves(); // after .show -- a hidden canvas has no width to draw into
   }
+
+  // ---------------------------------------------------------------------
+  // Live analogue meters (RMS / Peak / LUFS-M). They read the audio that is
+  // actually playing in the preview <audio> (through a Web Audio analyser
+  // tap), so they follow whichever version -- Original or Mastered -- is
+  // selected. Needles are driven by a small damped spring, so they swing
+  // and settle like real ones. The analysis only reads the signal: what you
+  // hear and what you download are not touched. The loop runs only while
+  // something is moving.
+  // ---------------------------------------------------------------------
+  var LiveMeters = (function(){
+    var SW = 52, PX = 120, PY = 128, R = 98, REST = -55;
+    var DEFS = {
+      rms:  { min:-30, max:0,  major:[-30,-20,-10,-5,0],     minor:[-25,-15,-7.5,-2.5], red:-3, unit:'RMS · dBFS' },
+      peak: { min:-30, max:0,  major:[-30,-20,-10,-5,0],     minor:[-25,-15,-7.5,-2.5], red:-1, unit:'PEAK · dBFS' },
+      lufs: { min:-40, max:-5, major:[-40,-30,-20,-10,-5],   minor:[-35,-25,-15,-7.5],  red:-8, unit:'LUFS · M' }
+    };
+    var ORDER = ['rms', 'peak', 'lufs'];
+    var G = {}; // per gauge: needle element, spring state, readout element
+
+    function ang(d, v){ var f = (Math.max(d.min, Math.min(d.max, v)) - d.min) / (d.max - d.min); return -SW + 2 * SW * f; }
+    function pt(a, r){ var rad = a * Math.PI / 180; return [PX + r * Math.sin(rad), PY - r * Math.cos(rad)]; }
+    function f1(n){ return n.toFixed(1); }
+    function arc(a0, a1, r){ var p0 = pt(a0, r), p1 = pt(a1, r); return 'M' + f1(p0[0]) + ' ' + f1(p0[1]) + ' A' + r + ' ' + r + ' 0 0 1 ' + f1(p1[0]) + ' ' + f1(p1[1]); }
+
+    function buildSvg(id, d){
+      var s = '<svg viewBox="0 0 240 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">';
+      s += '<defs><linearGradient id="vuf-' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7edd2"/><stop offset="1" stop-color="#e3d3a8"/></linearGradient>' +
+           '<linearGradient id="vug-' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient></defs>';
+      s += '<rect x="1" y="1" width="238" height="148" rx="10" fill="url(#vuf-' + id + ')" stroke="#2a2418" stroke-width="2"/>';
+      s += '<path d="' + arc(ang(d, d.red), SW, R) + '" fill="none" stroke="#c0392b" stroke-width="6"/>';
+      s += '<path d="' + arc(-SW, ang(d, d.red), R) + '" fill="none" stroke="#2a2418" stroke-width="1.6"/>';
+      var i, p, q, a;
+      for (i = 0; i < d.minor.length; i++) { a = ang(d, d.minor[i]); p = pt(a, R - 5); q = pt(a, R); s += '<line x1="' + f1(p[0]) + '" y1="' + f1(p[1]) + '" x2="' + f1(q[0]) + '" y2="' + f1(q[1]) + '" stroke="#2a2418" stroke-width="1.2"/>'; }
+      for (i = 0; i < d.major.length; i++) {
+        a = ang(d, d.major[i]); p = pt(a, R - 10); q = pt(a, R + 1);
+        var red = d.major[i] >= d.red;
+        s += '<line x1="' + f1(p[0]) + '" y1="' + f1(p[1]) + '" x2="' + f1(q[0]) + '" y2="' + f1(q[1]) + '" stroke="' + (red ? '#c0392b' : '#2a2418') + '" stroke-width="2"/>';
+        var tp = pt(a, R - 21);
+        s += '<text x="' + f1(tp[0]) + '" y="' + f1(tp[1] + 3.5) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="10.5" font-weight="700" fill="' + (red ? '#c0392b' : '#2a2418') + '">' + String(d.major[i]).replace('-', '−') + '</text>';
+      }
+      s += '<text x="120" y="104" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="700" letter-spacing="1.2" fill="#2a2418" opacity=".75">' + d.unit + '</text>';
+      s += '<line id="vumk-' + id + '" x1="0" y1="0" x2="0" y2="0" stroke="#2b6cff" stroke-width="3.2" stroke-linecap="round" visibility="hidden"/>';
+      s += '<path d="M2 150 L2 126 Q120 112 238 126 L238 150 Z" fill="#2a2418"/>';
+      s += '<g id="vun-' + id + '" transform="rotate(' + REST + ' ' + PX + ' ' + PY + ')"><line x1="120" y1="140" x2="120" y2="36" stroke="#b3261e" stroke-width="2.4" stroke-linecap="round"/></g>';
+      s += '<circle cx="120" cy="128" r="8" fill="#1d1a12" stroke="#5a4e36" stroke-width="2"/>';
+      s += '<path d="M3 3 H237 V70 Q120 52 3 70 Z" fill="url(#vug-' + id + ')" pointer-events="none"/>';
+      return s + '</svg>';
+    }
+
+    ORDER.forEach(function(id){
+      var holder = document.getElementById('vu-dial-' + id);
+      if (!holder) return;
+      holder.innerHTML = buildSvg(id, DEFS[id]);
+      G[id] = { d: DEFS[id], needle: document.getElementById('vun-' + id), mark: document.getElementById('vumk-' + id),
+                read: document.getElementById('vu-val-' + id), a: REST, v: 0, target: REST, shown: '' };
+    });
+
+    function setMark(id, value){
+      var g = G[id]; if (!g || !g.mark) return;
+      if (!isFinite(value)) { g.mark.setAttribute('visibility', 'hidden'); return; }
+      var a = ang(g.d, value), p = pt(a, R + 3), q = pt(a, R + 11);
+      g.mark.setAttribute('x1', f1(p[0])); g.mark.setAttribute('y1', f1(p[1]));
+      g.mark.setAttribute('x2', f1(q[0])); g.mark.setAttribute('y2', f1(q[1]));
+      g.mark.setAttribute('visibility', 'visible');
+    }
+
+    // ---- audio tap ----
+    var ctx = null, failed = false, nCh = 2;
+    var anL, anR, knL, knR, bufL, bufR, kbufL, kbufR, kLen = 0;
+
+    function kWeightCoeffs(fs){
+      var f0 = 1681.974450955533, Gdb = 3.999843853973347, Q = 0.7071752369554196;
+      var K = Math.tan(Math.PI * f0 / fs), Vh = Math.pow(10, Gdb / 20), Vb = Math.pow(Vh, 0.4996667741545416);
+      var a0 = 1 + K / Q + K * K;
+      var s1 = { b: [(Vh + Vb * K / Q + K * K) / a0, 2 * (K * K - Vh) / a0, (Vh - Vb * K / Q + K * K) / a0], a: [1, 2 * (K * K - 1) / a0, (1 - K / Q + K * K) / a0] };
+      f0 = 38.13547087602444; Q = 0.5003270373238773;
+      K = Math.tan(Math.PI * f0 / fs); a0 = 1 + K / Q + K * K;
+      var s2 = { b: [1, -2, 1], a: [1, 2 * (K * K - 1) / a0, (1 - K / Q + K * K) / a0] };
+      return [s1, s2];
+    }
+
+    function ensureGraph(){
+      if (ctx) return true;
+      if (failed) return false;
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { failed = true; return false; }
+      try {
+        ctx = new AC();
+        var src = ctx.createMediaElementSource(previewAudio);
+        var mon = ctx.createGain();
+        mon.channelCount = 2; mon.channelCountMode = 'explicit'; mon.channelInterpretation = 'speakers';
+        src.connect(mon); mon.connect(ctx.destination);
+        var sp = ctx.createChannelSplitter(2);
+        mon.connect(sp);
+        anL = ctx.createAnalyser(); anR = ctx.createAnalyser();
+        anL.fftSize = anR.fftSize = 8192;
+        sp.connect(anL, 0); sp.connect(anR, 1);
+        bufL = new Float32Array(8192); bufR = new Float32Array(8192);
+        // K-weighted copy for loudness (ITU-R BS.1770 filters at this context's rate)
+        var tail = mon;
+        try {
+          var kc = kWeightCoeffs(ctx.sampleRate);
+          var f1n = ctx.createIIRFilter(kc[0].b, kc[0].a), f2n = ctx.createIIRFilter(kc[1].b, kc[1].a);
+          mon.connect(f1n); f1n.connect(f2n); tail = f2n;
+        } catch (e) { tail = mon; }
+        var sp2 = ctx.createChannelSplitter(2);
+        tail.connect(sp2);
+        knL = ctx.createAnalyser(); knR = ctx.createAnalyser();
+        knL.fftSize = knR.fftSize = 32768;
+        sp2.connect(knL, 0); sp2.connect(knR, 1);
+        kbufL = new Float32Array(32768); kbufR = new Float32Array(32768);
+        kLen = Math.min(32768, Math.round(0.4 * ctx.sampleRate));
+        return true;
+      } catch (e) {
+        failed = true; ctx = null;
+        var blk = document.getElementById('vu-block'); if (blk) blk.style.display = 'none';
+        return false;
+      }
+    }
+
+    function powerOf(buf, from, to){
+      var s = 0, pk = 0;
+      for (var i = from; i < to; i++) { var x = buf[i]; s += x * x; var ax = x < 0 ? -x : x; if (ax > pk) pk = ax; }
+      return { ms: s / (to - from), pk: pk };
+    }
+    function db10(x){ return 10 * Math.log(x + 1e-12) / Math.LN10; }
+
+    function measure(){
+      anL.getFloatTimeDomainData(bufL);
+      var a = powerOf(bufL, 0, bufL.length), b = { ms: 0, pk: 0 };
+      if (nCh >= 2) { anR.getFloatTimeDomainData(bufR); b = powerOf(bufR, 0, bufR.length); }
+      var rmsMs = nCh >= 2 ? (a.ms + b.ms) / 2 : a.ms;
+      knL.getFloatTimeDomainData(kbufL);
+      var ka = powerOf(kbufL, kbufL.length - kLen, kbufL.length), kb = { ms: 0 };
+      if (nCh >= 2) { knR.getFloatTimeDomainData(kbufR); kb = powerOf(kbufR, kbufR.length - kLen, kbufR.length); }
+      return { rms: db10(rmsMs), peak: 20 * Math.log(Math.max(a.pk, b.pk) + 1e-9) / Math.LN10, lufs: -0.691 + db10(ka.ms + kb.ms) };
+    }
+
+    // ---- animation ----
+    var playing = false, raf = 0, lastTs = 0, readT = 0;
+    var sm = { rms: -90, peak: -90, lufs: -90 };
+
+    function fmtVal(id, v){
+      if (v <= G[id].d.min - 15) return '—';
+      return v.toFixed(1).replace('-', '−') + (id === 'lufs' ? ' LUFS' : ' dB');
+    }
+
+    function frame(ts){
+      var dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0.016;
+      lastTs = ts;
+      var live = null;
+      if (playing && ctx) { try { live = measure(); } catch (e) { live = null; } }
+      if (live) {
+        sm.rms += (live.rms - sm.rms) * (1 - Math.exp(-dt / 0.1));
+        sm.peak = Math.max(live.peak, sm.peak - 24 * dt);   // instant attack, slow release
+        sm.lufs += (live.lufs - sm.lufs) * (1 - Math.exp(-dt / 0.08));
+      } else {
+        sm.rms -= 60 * dt; sm.peak -= 60 * dt; sm.lufs -= 60 * dt;
+      }
+      var moving = false;
+      ORDER.forEach(function(id){
+        var g = G[id]; if (!g) return;
+        var val = sm[id];
+        g.target = val <= g.d.min ? REST : ang(g.d, val);
+        var steps = dt > 0.025 ? 2 : 1, h = dt / steps, k = 190, c = 2 * Math.sqrt(k) * 0.72;
+        for (var n = 0; n < steps; n++) { g.v += (k * (g.target - g.a) - c * g.v) * h; g.a += g.v * h; }
+        if (g.a < REST) { g.a = REST; if (g.v < 0) g.v = 0; }
+        if (g.a > SW + 5) { g.a = SW + 5; if (g.v > 0) g.v = 0; }
+        g.needle.setAttribute('transform', 'rotate(' + g.a.toFixed(2) + ' ' + PX + ' ' + PY + ')');
+        if (Math.abs(g.a - g.target) > 0.15 || Math.abs(g.v) > 0.4) moving = true;
+      });
+      readT += dt;
+      if (readT > 0.1 || !(playing || moving)) {
+        readT = 0;
+        ORDER.forEach(function(id){
+          var g = G[id]; if (!g || !g.read) return;
+          var txt = (playing && live) ? fmtVal(id, sm[id]) : '—';
+          if (txt !== g.shown) { g.read.textContent = txt; g.shown = txt; }
+        });
+      }
+      if (playing || moving) raf = requestAnimationFrame(frame);
+      else { raf = 0; lastTs = 0; }
+    }
+    function kick(){ if (!raf) { lastTs = 0; raf = requestAnimationFrame(frame); } }
+
+    previewAudio.addEventListener('play', function(){
+      if (!ensureGraph()) return;
+      try { if (ctx.state === 'suspended') ctx.resume(); } catch (e) {}
+      playing = true; kick();
+    });
+    ['pause', 'ended'].forEach(function(ev){
+      previewAudio.addEventListener(ev, function(){ playing = false; kick(); });
+    });
+
+    return {
+      setChannels: function(n){ nCh = n >= 2 ? 2 : 1; },
+      setMarks: function(targetLufs, ceilingDb){ setMark('lufs', targetLufs); setMark('peak', ceilingDb); }
+    };
+  })();
 
   // All DOM refs and handlers above are now wired up -- safe to paint the
   // initial language.
